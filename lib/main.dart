@@ -1,6 +1,7 @@
 
 import 'package:docsview/routes/routes.dart';
 import 'package:docsview/routes/routes_name.dart';
+import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,10 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primaryColor: AppColors.themeColor,
+            primarySwatch: Colors.blue
       ),
       initialRoute: RoutesName.homeScreenView,
       onGenerateRoute: Routes.generatedRoutes,
