@@ -28,7 +28,7 @@ class HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: _pages[_page], // Display the selected page here
+      body: _pages[_page],
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.white,
         color: AppColors.themeColor,
