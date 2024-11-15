@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:lottie/lottie.dart';
 
 import '../model/api_services.dart';
 import '../utils/app_colors.dart';
@@ -154,11 +155,32 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                             fontFamily: "Poppins", overflow: TextOverflow.clip),
                       ),
                     ),
-              ElevatedButton(
-                onPressed: _isLoading ? null : processPdf,
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Process PDF'),
+              InkWell(
+                onTap: _isLoading ? null : processPdf,
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: AppColors.themeColor,
+                    borderRadius: BorderRadius.all(Radius.circular(6)),
+                  ),
+                  alignment: Alignment.center,
+                  child: _isLoading
+                      ? Lottie.asset("assets/images/loading.json",
+                          alignment: Alignment.center,
+                          repeat: true,
+                          fit: BoxFit.cover)
+                      : const Text(
+                          "Process PDF",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Poppins",
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
               ),
             ],
           ),
