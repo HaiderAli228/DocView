@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.themeColor,
             primarySwatch: Colors.blue
       ),
-      initialRoute: RoutesName.homeScreenView,
+      initialRoute: RoutesName.introScreenView,
       onGenerateRoute: Routes.generatedRoutes,
     );
   }

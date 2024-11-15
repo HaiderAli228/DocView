@@ -1,5 +1,6 @@
 
 import 'package:docsview/routes/routes_name.dart';
+import 'package:docsview/view/intro_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../view/home_view.dart';
@@ -9,6 +10,8 @@ class Routes {
     switch (setting.name) {
       case RoutesName.homeScreenView:
         return _createRoute(const HomeView());
+        case RoutesName.introScreenView:
+        return _createRoute(const IntroScreen());
       default:
         return _createRoute(
           const Scaffold(
