@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 
-import '../model/api-services.dart';
+import '../model/api_services.dart';
+import '../utils/app_colors.dart';
+import 'second_tab(paper).dart';
 
 class FirstTabScanner extends StatefulWidget {
   const FirstTabScanner({super.key});
@@ -13,6 +15,7 @@ class FirstTabScanner extends StatefulWidget {
 
 class _FirstTabScannerState extends State<FirstTabScanner> {
   File? _pdfFile;
+  bool _isLoading = false;
 
   // Pick a PDF file from the device
   Future<void> pickPdf() async {
@@ -32,36 +35,133 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   Future<void> processPdf() async {
     if (_pdfFile != null) {
       String prompt = "Give me a summary of this PDF file.";
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
         String result = await generateContentFromPdf(_pdfFile!, prompt);
-        print(result); // For now, print the result
-        // You can navigate to another screen or display the result
+
+        // Navigate to SecondTabPaper with the summary
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SecondTabPaper(summary: result),
+          ),
+        );
       } catch (e) {
-        print("Error processing PDF: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error processing PDF: $e")),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No PDF file selected!")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('PDF Scanner')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _pdfFile == null
-                ? const Text('No PDF selected')
-                : Text('Selected PDF: ${_pdfFile!.path}'),
-            ElevatedButton(
-              onPressed: pickPdf,
-              child: const Text('Pick PDF'),
-            ),
-            ElevatedButton(
-              onPressed: processPdf,
-              child: const Text('Process PDF'),
-            ),
-          ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.02,
+              ),
+              RichText(
+                text: const TextSpan(
+                  style: TextStyle(fontSize: 27), // Responsive font size
+                  children: [
+                    TextSpan(
+                        text: "Upload and scan your PDF with ",
+                        style: TextStyle(
+                            color: Colors.black, fontFamily: "Poppins")),
+                    TextSpan(
+                        text: "DocView",
+                        style: TextStyle(
+                            color: AppColors.themeColor,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Poppins")),
+                  ],
+                ),
+                textAlign: TextAlign.left, // Align text to left
+              ),
+              InkWell(
+                onTap: pickPdf,
+                child: Container(
+                  height: 200,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(5),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(
+                          color: Colors.grey.shade200,
+                          style: BorderStyle.solid)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.cloud_upload_outlined,
+                        color: Colors.grey.shade400,
+                        size: 50,
+                      ),
+                      Text(
+                        "Click to upload",
+                        style: TextStyle(
+                          color: Colors.grey.shade400,
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          overflow: TextOverflow.fade,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              _pdfFile == null
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15,
+                      ),
+                      child: Text(
+                        'No PDF selected',
+                        style: TextStyle(
+                            fontFamily: "Poppins", overflow: TextOverflow.clip),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                      ),
+                      child: Text(
+                        'Selected PDF: ${_pdfFile!.path}',
+                        style: const TextStyle(
+                            fontFamily: "Poppins", overflow: TextOverflow.clip),
+                      ),
+                    ),
+              ElevatedButton(
+                onPressed: _isLoading ? null : processPdf,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Process PDF'),
+              ),
+            ],
+          ),
         ),
       ),
     );
