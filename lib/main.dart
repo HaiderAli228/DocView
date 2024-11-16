@@ -1,4 +1,3 @@
-
 import 'package:docsview/routes/routes.dart';
 import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/utils/app_colors.dart';
@@ -17,10 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: AppColors.themeColor,
-            primarySwatch: Colors.blue
-      ),
-      initialRoute: RoutesName.introScreenView,
+          primaryColor: AppColors.themeColor, primarySwatch: Colors.blue),
+      initialRoute: RoutesName.homeScreenView,
       onGenerateRoute: Routes.generatedRoutes,
     );
   }
