@@ -1,10 +1,11 @@
+import 'package:docsview/view/second_tab(paper).dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:lottie/lottie.dart';
 import '../model/api_services.dart';
 import '../utils/app_colors.dart';
-import 'second_tab(paper).dart';
+import '../utils/toast_msg.dart'; // Import ToastHelper
 
 class FirstTabScanner extends StatefulWidget {
   const FirstTabScanner({super.key});
@@ -27,7 +28,10 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
     if (result != null) {
       setState(() {
         _pdfFile = File(result.files.single.path!);
+        ToastHelper.showToast("PDF file selected.");
       });
+    } else {
+      ToastHelper.showToast("No file selected.");
     }
   }
 
@@ -50,18 +54,14 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
           ),
         );
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error processing PDF: $e")),
-        );
+        ToastHelper.showToast("Error processing PDF: $e");
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No PDF file selected!")),
-      );
+      ToastHelper.showToast("No PDF file selected!");
     }
   }
 
@@ -118,34 +118,34 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                       ),
                       child: _pdfFile == null
                           ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.cloud_upload_outlined,
-                                  color: Colors.grey.shade400,
-                                  size: 50,
-                                ),
-                                Text(
-                                  "Click to upload",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    overflow: TextOverflow.fade,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : const Text(
-                              'PDF Selected',
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.cloud_upload_outlined,
+                            color: Colors.grey.shade400,
+                            size: 50,
+                          ),
+                          Text(
+                            "Click to upload",
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontFamily: "Poppins",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              overflow: TextOverflow.fade,
                             ),
+                          ),
+                        ],
+                      )
+                          : const Text(
+                        'PDF Selected',
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                   Padding(
