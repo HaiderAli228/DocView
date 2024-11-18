@@ -19,16 +19,27 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   bool _isLoading = false;
 
   // Pick a PDF file from the device
-  Future<void> pickPdf() async {
+  Future<void> pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
+      allowedExtensions: [
+        'pdf',
+        'js',
+        'py',
+        'txt',
+        'html',
+        'css',
+        'md',
+        'csv',
+        'xml',
+        'rtf',
+      ],
     );
 
     if (result != null) {
       setState(() {
         _pdfFile = File(result.files.single.path!);
-        ToastHelper.showToast("PDF file selected.");
+        ToastHelper.showToast("File selected: ${result.files.single.name}");
       });
     } else {
       ToastHelper.showToast("No file selected.");
@@ -36,32 +47,50 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   }
 
   // Call the API to process PDF
-  Future<void> processPdf() async {
+  Future<void> processFile() async {
     if (_pdfFile != null) {
-      String prompt = "Give me a summary of this PDF file.";
+      // Validate file extension
+      final validExtensions = ['pdf', 'js', 'py', 'txt', 'html', 'css', 'md', 'csv', 'xml', 'rtf'];
+      final fileExtension = _pdfFile!.path.split('.').last.toLowerCase();
+
+      if (!validExtensions.contains(fileExtension)) {
+        ToastHelper.showToast("Invalid file type. Please select a valid file.");
+        return;
+      }
+
+      String prompt = "Provide a summary and outlines for this document.";
       setState(() {
         _isLoading = true;
       });
 
       try {
-        String result = await generateContentFromPdf(_pdfFile!, prompt);
+        final result = await generateContentFromFile(_pdfFile!, prompt);
 
-        // Navigate to SecondTabPaper with the summary
+        // Navigate to SecondTabPaper with both summary and outlines
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SecondTabPaper(summary: result),
+            builder: (context) => SecondTabPaper(
+              summary: result['summary'],
+              outlines: result['outlines'],
+            ),
           ),
         );
+      } on SocketException {
+        ToastHelper.showToast("Network error. Please check your connection.");
+      } on HttpException {
+        ToastHelper.showToast("Server error. Unable to process the file.");
+      } on FormatException {
+        ToastHelper.showToast("Invalid response format from the server.");
       } catch (e) {
-        ToastHelper.showToast("Error processing PDF: $e");
+        ToastHelper.showToast("An unexpected error occurred: $e");
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
     } else {
-      ToastHelper.showToast("No PDF file selected!");
+      ToastHelper.showToast("No file selected!");
     }
   }
 
@@ -100,7 +129,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                     textAlign: TextAlign.left, // Align text to left
                   ),
                   InkWell(
-                    onTap: pickPdf,
+                    onTap: pickFile,
                     child: Container(
                       height: 200,
                       alignment: Alignment.center,
@@ -118,34 +147,34 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                       ),
                       child: _pdfFile == null
                           ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.cloud_upload_outlined,
-                            color: Colors.grey.shade400,
-                            size: 50,
-                          ),
-                          Text(
-                            "Click to upload",
-                            style: TextStyle(
-                              color: Colors.grey.shade400,
-                              fontFamily: "Poppins",
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              overflow: TextOverflow.fade,
-                            ),
-                          ),
-                        ],
-                      )
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.cloud_upload_outlined,
+                                  color: Colors.grey.shade400,
+                                  size: 50,
+                                ),
+                                Text(
+                                  "Click to upload",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ),
+                              ],
+                            )
                           : const Text(
-                        'PDF Selected',
-                        style: TextStyle(
-                          fontFamily: "Poppins",
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                              'PDF Selected',
+                              style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                     ),
                   ),
                   Padding(
@@ -161,7 +190,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                     ),
                   ),
                   InkWell(
-                    onTap: _isLoading ? null : processPdf,
+                    onTap: _isLoading ? null : processFile,
                     child: Container(
                       height: 50,
                       padding: const EdgeInsets.all(5),
