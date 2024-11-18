@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class SecondTabPaper extends StatelessWidget {
   final String? summary;
   final String? outlines;
@@ -9,7 +10,13 @@ class SecondTabPaper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Document Analysis')),
+      appBar: AppBar(
+        title: const Text(
+          'Document Analysis',
+          style: TextStyle(fontFamily: "Poppins"),
+        ),
+        backgroundColor: Colors.teal,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -18,17 +25,25 @@ class SecondTabPaper extends StatelessWidget {
             children: [
               const Text(
                 "Summary:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Poppins",
+                ),
               ),
               const SizedBox(height: 8),
-              _buildScrollableText(context, summary ?? 'No summary available.'),
+              _buildScrollableText(summary ?? 'No summary available.'),
               const Divider(height: 30),
               const Text(
                 "Outlines:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Poppins",
+                ),
               ),
               const SizedBox(height: 8),
-              _buildScrollableText(context, outlines ?? 'No outlines available.'),
+              _buildScrollableText(outlines ?? 'No outlines available.'),
             ],
           ),
         ),
@@ -36,19 +51,22 @@ class SecondTabPaper extends StatelessWidget {
     );
   }
 
-  Widget _buildScrollableText(BuildContext context, String text) {
+  // A method to build scrollable text blocks with appropriate styling
+  Widget _buildScrollableText(String content) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
+        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: Colors.grey.shade300),
       ),
-      height: MediaQuery.of(context).size.height * 0.4, // Adjust height
-      child: SingleChildScrollView(
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 16),
+      child: Text(
+        content,
+        style: const TextStyle(
+          fontSize: 16,
+          fontFamily: "Poppins",
         ),
+        textAlign: TextAlign.justify,
       ),
     );
   }

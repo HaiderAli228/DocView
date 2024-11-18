@@ -1,69 +1,61 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-import 'package:http_parser/http_parser.dart';
-import '../utils/app_links.dart'; // Import the constants class
+import 'package:http/http.dart' as http;
 
-Future<Map<String, String>> generateContentFromFile(
-    File file, String prompt) async {
-  final String mimeType = _getMimeType(file.path);
+class ApiService {
+  static const String apiKey = "YOUR_GEMINI_API_KEY"; // Replace with your API key
+  static const String fileUploadEndpoint = "https://api.gemini.com/v1/files/upload";
+  static const String contentGenerationEndpoint = "https://api.gemini.com/v1/models/generateContent";
 
-  var request =
-      http.MultipartRequest('POST', Uri.parse(ApiConstants.geminiApiEndpoint));
+  /// Uploads a file to the server and returns the file ID.
+  static Future<String?> uploadDocument(File file) async {
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(fileUploadEndpoint));
+      request.headers['Authorization'] = 'Bearer $apiKey';
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
 
-  // Attach the file to the request
-  request.files.add(await http.MultipartFile.fromPath(
-    'file',
-    file.path,
-    contentType: MediaType(mimeType.split('/')[0], mimeType.split('/')[1]),
-  ));
-
-  // Add prompt and API Key
-  request.headers['Authorization'] = 'Bearer ${ApiConstants.apiKey}';
-  request.fields['prompt'] = prompt;
-
-  var response = await request.send();
-
-  if (response.statusCode == 200) {
-    var responseBody = await response.stream.bytesToString();
-    var data = jsonDecode(responseBody);
-
-    // Return summary and outlines
-    return {
-      "summary": data['summary'] ?? "No summary available.",
-      "outlines": data['outlines'] ?? "No outlines available."
-    };
-  } else {
-    throw Exception(
-        'Failed to process file. Status Code: ${response.statusCode}, Error: ${response.reasonPhrase}');
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var jsonResponse = jsonDecode(responseData);
+        return jsonResponse['file_id']; // Replace with the actual key for file ID
+      } else {
+        print("Upload failed: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("Error during file upload: $e");
+    }
+    return null;
   }
-}
 
-// Helper function to get MIME type
-String _getMimeType(String filePath) {
-  final extension = filePath.split('.').last;
-  switch (extension) {
-    case 'pdf':
-      return 'application/pdf';
-    case 'js':
-      return 'application/x-javascript';
-    case 'py':
-      return 'application/x-python';
-    case 'txt':
-      return 'text/plain';
-    case 'html':
-      return 'text/html';
-    case 'css':
-      return 'text/css';
-    case 'md':
-      return 'text/md';
-    case 'csv':
-      return 'text/csv';
-    case 'xml':
-      return 'text/xml';
-    case 'rtf':
-      return 'text/rtf';
-    default:
-      return 'application/octet-stream';
+  /// Generates content for the uploaded file using the provided prompt.
+  static Future<Map<String, String>?> generateDocumentContent(String fileId, String prompt) async {
+    try {
+      final response = await http.post(
+        Uri.parse(contentGenerationEndpoint),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'file_id': fileId,
+          'prompt': prompt,
+          'model_name': 'gemini-1.5-flash', // Replace with your specific model name
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        return {
+          "summary": jsonResponse['summary'] ?? "No summary available.",
+          "outlines": jsonResponse['outlines'] ?? "No outlines available.",
+        };
+      } else {
+        print("Content generation failed: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("Error during content generation: $e");
+    }
+    return null;
   }
 }

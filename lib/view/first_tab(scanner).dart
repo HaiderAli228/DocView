@@ -70,7 +70,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
         'md',
         'csv',
         'xml',
-        'rtf'
+        'rtf',
       ];
       final fileExtension = _pdfFile!.path.split('.').last.toLowerCase();
 
@@ -88,16 +88,27 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
       });
 
       try {
-        // Call your API to process the file
-        final result = await generateContentFromFile(_pdfFile!, prompt);
+        // Step 1: Upload the document to get the file ID
+        final fileId = await ApiService.uploadDocument(_pdfFile!);
+        if (fileId == null) {
+          ToastHelper.showToast("File upload failed. Please try again.");
+          return;
+        }
 
-        // Navigate to the result screen with summary and outlines
+        // Step 2: Use the file ID to generate content
+        final result = await ApiService.generateDocumentContent(fileId, prompt);
+        if (result == null) {
+          ToastHelper.showToast("Failed to process the file. Please try again.");
+          return;
+        }
+
+        // Step 3: Navigate to the result screen with summary and outlines
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => SecondTabPaper(
-              summary: result['summary'],
-              outlines: result['outlines'],
+              summary: result['summary']!,
+              outlines: result['outlines']!,
             ),
           ),
         );
