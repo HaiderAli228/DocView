@@ -14,52 +14,41 @@ class HomeView extends StatefulWidget {
 }
 
 class HomeViewState extends State<HomeView> {
-  // int _page = 0;
-  // final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
-  //
-  // // List of pages to display based on the selected index
-  // final List<Widget> _pages = [
-  //   const FirstTabScanner(),
-  //   const SecondTabPaper(),
-  //   const ThirdTabProfile(),
-  // ];
+  int _page = 0;
+  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
+
+  // List of pages to display based on the selected index
+  final List<Widget> _pages = [
+    const FirstTabScanner(),
+    const SecondTabPaper(),
+    const ThirdTabProfile(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Text("Home Page",style: TextStyle(
-          fontSize: 50,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-          fontFamily: "Poppins"
-        ),),
+      body: _pages[_page],
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: Colors.white,
+        color: AppColors.themeColor,
+        key: _bottomNavigationKey,
+        animationDuration: const Duration(milliseconds: 300),
+        animationCurve: Curves.linear,
+        items: const [
+          Icon(Icons.screen_search_desktop_rounded,
+              color: AppColors.themeIconColor, size: 30),
+          Icon(Icons.assignment_rounded,
+              color: AppColors.themeIconColor, size: 30),
+          Icon(FontAwesomeIcons.solidCircleUser,
+              color: AppColors.themeIconColor, size: 30),
+        ],
+        onTap: (index) {
+          setState(() {
+            _page = index;
+          });
+        },
       ),
     );
-    // return Scaffold(
-    //   backgroundColor: Colors.white,
-    //   body: _pages[_page],
-    //   bottomNavigationBar: CurvedNavigationBar(
-    //     backgroundColor: Colors.white,
-    //     color: AppColors.themeColor,
-    //     key: _bottomNavigationKey,
-    //     animationDuration: const Duration(milliseconds: 300),
-    //     animationCurve: Curves.linear,
-    //     items: const [
-    //       Icon(Icons.screen_search_desktop_rounded,
-    //           color: AppColors.themeIconColor, size: 30),
-    //       Icon(Icons.assignment_rounded,
-    //           color: AppColors.themeIconColor, size: 30),
-    //       Icon(FontAwesomeIcons.solidCircleUser,
-    //           color: AppColors.themeIconColor, size: 30),
-    //     ],
-    //     onTap: (index) {
-    //       setState(() {
-    //         _page = index;
-    //       });
-    //     },
-    //   ),
-    // );
   }
 }

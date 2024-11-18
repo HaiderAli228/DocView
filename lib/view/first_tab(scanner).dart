@@ -18,11 +18,49 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   File? _pdfFile;
   bool _isLoading = false;
 
-  // Pick a PDF file from the device
+  // Pick a PDF or other allowed file
   Future<void> pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: [
+    try {
+      // Allow picking files with specified extensions
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: [
+          'pdf',
+          'js',
+          'py',
+          'txt',
+          'html',
+          'css',
+          'md',
+          'csv',
+          'xml',
+          'rtf',
+        ],
+      );
+
+      if (result != null) {
+        // Update the state with the selected file
+        setState(() {
+          _pdfFile = File(result.files.single.path!);
+        });
+
+        // Show a toast confirming the selection
+        ToastHelper.showToast("File selected: ${result.files.single.name}");
+      } else {
+        // Handle the case where no file is selected
+        ToastHelper.showToast("No file selected.");
+      }
+    } catch (e) {
+      // Catch any unexpected errors during file picking
+      ToastHelper.showToast("Error picking file: $e");
+    }
+  }
+
+// Process the selected file
+  Future<void> processFile() async {
+    if (_pdfFile != null) {
+      // Validate file extension
+      final validExtensions = [
         'pdf',
         'js',
         'py',
@@ -32,25 +70,8 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
         'md',
         'csv',
         'xml',
-        'rtf',
-      ],
-    );
-
-    if (result != null) {
-      setState(() {
-        _pdfFile = File(result.files.single.path!);
-        ToastHelper.showToast("File selected: ${result.files.single.name}");
-      });
-    } else {
-      ToastHelper.showToast("No file selected.");
-    }
-  }
-
-  // Call the API to process PDF
-  Future<void> processFile() async {
-    if (_pdfFile != null) {
-      // Validate file extension
-      final validExtensions = ['pdf', 'js', 'py', 'txt', 'html', 'css', 'md', 'csv', 'xml', 'rtf'];
+        'rtf'
+      ];
       final fileExtension = _pdfFile!.path.split('.').last.toLowerCase();
 
       if (!validExtensions.contains(fileExtension)) {
@@ -58,15 +79,19 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
         return;
       }
 
+      // Define the prompt for processing
       String prompt = "Provide a summary and outlines for this document.";
+
+      // Show loading state
       setState(() {
         _isLoading = true;
       });
 
       try {
+        // Call your API to process the file
         final result = await generateContentFromFile(_pdfFile!, prompt);
 
-        // Navigate to SecondTabPaper with both summary and outlines
+        // Navigate to the result screen with summary and outlines
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -85,6 +110,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
       } catch (e) {
         ToastHelper.showToast("An unexpected error occurred: $e");
       } finally {
+        // Hide loading state
         setState(() {
           _isLoading = false;
         });
