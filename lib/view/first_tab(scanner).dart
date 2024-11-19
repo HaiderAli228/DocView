@@ -98,7 +98,8 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
         // Step 2: Use the file ID to generate content
         final result = await ApiService.generateDocumentContent(fileId, prompt);
         if (result == null) {
-          ToastHelper.showToast("Failed to process the file. Please try again.");
+          ToastHelper.showToast(
+              "Failed to process the file. Please try again.");
           return;
         }
 
@@ -138,129 +139,136 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: Stack(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  RichText(
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 27), // Responsive font size
-                      children: [
-                        TextSpan(
-                            text: "Upload and scan your PDF with ",
-                            style: TextStyle(
-                                color: Colors.black, fontFamily: "Poppins")),
-                        TextSpan(
-                            text: "DocView",
-                            style: TextStyle(
-                                color: AppColors.themeColor,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: "Poppins")),
-                      ],
+          body: SingleChildScrollView(
+            child: Stack(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
                     ),
-                    textAlign: TextAlign.left, // Align text to left
-                  ),
-                  InkWell(
-                    onTap: pickFile,
-                    child: Container(
-                      height: 200,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                        border: Border.all(
-                            color: Colors.grey.shade200,
-                            style: BorderStyle.solid),
-                      ),
-                      child: _pdfFile == null
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.cloud_upload_outlined,
-                                  color: Colors.grey.shade400,
-                                  size: 50,
-                                ),
-                                Text(
-                                  "Click to upload",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    overflow: TextOverflow.fade,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : const Text(
-                              'PDF Selected',
+                    RichText(
+                      text: const TextSpan(
+                        style: TextStyle(fontSize: 27), // Responsive font size
+                        children: [
+                          TextSpan(
+                              text: "Upload and scan your PDF with ",
                               style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      _pdfFile == null
-                          ? 'No PDF selected'
-                          : 'Selected PDF: ${_pdfFile!.path.split('/').last}',
-                      style: const TextStyle(
-                          fontFamily: "Poppins",
-                          overflow: TextOverflow.clip,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: _isLoading ? null : processFile,
-                    child: Container(
-                      height: 50,
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 20),
-                      decoration: const BoxDecoration(
-                        color: AppColors.themeColor,
-                        borderRadius: BorderRadius.all(Radius.circular(6)),
+                                  color: Colors.black, fontFamily: "Poppins")),
+                          TextSpan(
+                              text: "DocView",
+                              style: TextStyle(
+                                  color: AppColors.themeColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: "Poppins")),
+                        ],
                       ),
+                      textAlign: TextAlign.left, // Align text to left
+                    ),
+                    Container(
                       alignment: Alignment.center,
-                      child: const Text(
-                        "Process PDF",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Poppins",
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      child: Lottie.asset("assets/images/4.json",
+                          height: 200, fit: BoxFit.cover),
+                    ),
+                    InkWell(
+                      onTap: pickFile,
+                      child: Container(
+                        height: 200,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(5),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                          border: Border.all(
+                              color: Colors.grey.shade200,
+                              style: BorderStyle.solid),
+                        ),
+                        child: _pdfFile == null
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.cloud_upload_outlined,
+                                    color: Colors.grey.shade400,
+                                    size: 50,
+                                  ),
+                                  Text(
+                                    "Click to upload",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontFamily: "Poppins",
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const Text(
+                                'PDF Selected',
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 13, right: 13, top: 20),
+                      child: Text(
+                        _pdfFile == null
+                            ? 'No PDF selected'
+                            : 'Selected PDF: ${_pdfFile!.path.split('/').last}',
+                        style: const TextStyle(
+                            fontFamily: "Poppins",
+                            overflow: TextOverflow.clip,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: _isLoading ? null : processFile,
+                      child: Container(
+                        height: 50,
+                        padding: const EdgeInsets.all(5),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 20),
+                        decoration: const BoxDecoration(
+                          color: AppColors.themeColor,
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "Process PDF",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Poppins",
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              if (_isLoading)
-                Center(
-                  child: Lottie.asset(
-                    "assets/images/loading.json",
-                    alignment: Alignment.center,
-                    repeat: true,
-                    fit: BoxFit.cover,
-                  ),
+                  ],
                 ),
-            ],
+                if (_isLoading)
+                  Center(
+                    child: Lottie.asset(
+                      "assets/images/loading.json",
+                      alignment: Alignment.center,
+                      repeat: true,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
