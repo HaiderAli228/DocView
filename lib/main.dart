@@ -3,7 +3,13 @@ import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'model/api_services.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize authentication
+  await ApiService.initializeAuthentication();
   runApp(const MyApp());
 }
 

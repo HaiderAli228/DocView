@@ -136,13 +136,15 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: _isLoading
+            ? const EdgeInsets.all(0)
+            : const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: SingleChildScrollView(
-            child: Stack(
-              children: [
-                Column(
+          body: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -258,17 +260,40 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                     ),
                   ],
                 ),
-                if (_isLoading)
-                  Center(
-                    child: Lottie.asset(
-                      "assets/images/loading.json",
-                      alignment: Alignment.center,
-                      repeat: true,
-                      fit: BoxFit.cover,
+              ),
+              if (_isLoading)
+                Center(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(10)),
+                        color: Colors.white),
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          color: Colors.white
+                              .withOpacity(0.8), // Semi-transparent overlay
+                          alignment: Alignment.center,
+                          child: Lottie.asset(
+                            "assets/images/loading.json",
+                            repeat: true,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const Text(
+                          "Please wait until PDF process",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontFamily: "Poppins"),
+                        )
+                      ],
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),
