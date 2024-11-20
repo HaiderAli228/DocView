@@ -1,134 +1,96 @@
-import 'package:docsview/view/second_tab(paper).dart';
 import 'package:flutter/material.dart';
+import 'package:docsview/view/second_tab(paper).dart';
+import 'package:docx_to_text/docx_to_text.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../model/api_services.dart';
 import '../utils/app_colors.dart';
-import '../utils/toast_msg.dart'; // Import ToastHelper
 
 class FirstTabScanner extends StatefulWidget {
   const FirstTabScanner({super.key});
 
   @override
-  State<FirstTabScanner> createState() => _FirstTabScannerState();
+  State<FirstTabScanner> createState() => FirstTabScannerState();
 }
 
-class _FirstTabScannerState extends State<FirstTabScanner> {
-  File? _pdfFile;
-  bool _isLoading = false;
+class FirstTabScannerState extends State<FirstTabScanner> {
+  File? selectedFile;
+  bool isLoading = false;
 
-  // Pick a PDF or other allowed file
   Future<void> pickFile() async {
-    try {
-      // Allow picking files with specified extensions
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: [
-          'pdf',
-          'js',
-          'py',
-          'txt',
-          'html',
-          'css',
-          'md',
-          'csv',
-          'xml',
-          'rtf',
-        ],
-      );
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt', 'docx', 'pdf'], // Support multiple formats
+    );
 
-      if (result != null) {
-        // Update the state with the selected file
-        setState(() {
-          _pdfFile = File(result.files.single.path!);
-        });
-
-        // Show a toast confirming the selection
-        ToastHelper.showToast("File selected: ${result.files.single.name}");
-      } else {
-        // Handle the case where no file is selected
-        ToastHelper.showToast("No file selected.");
-      }
-    } catch (e) {
-      // Catch any unexpected errors during file picking
-      ToastHelper.showToast("Error picking file: $e");
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        selectedFile = File(result.files.single.path!); // Set the selected file
+      });
+    } else {
+      setState(() {
+        selectedFile = null; // No file selected
+      });
     }
   }
 
-// Process the selected file
   Future<void> processFile() async {
-    if (_pdfFile != null) {
-      // Validate file extension
-      final validExtensions = [
-        'pdf',
-        'js',
-        'py',
-        'txt',
-        'html',
-        'css',
-        'md',
-        'csv',
-        'xml',
-        'rtf',
-      ];
-      final fileExtension = _pdfFile!.path.split('.').last.toLowerCase();
+    if (selectedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a file to process.')),
+      );
+      return;
+    }
 
-      if (!validExtensions.contains(fileExtension)) {
-        ToastHelper.showToast("Invalid file type. Please select a valid file.");
-        return;
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      String fileContent = '';
+
+      // Check the file extension and read it accordingly
+      if (selectedFile!.path.endsWith('.txt')) {
+        // Read text file
+        fileContent = await selectedFile!.readAsString();
+      } else if (selectedFile!.path.endsWith('.docx')) {
+        // Use docx_to_text to extract content
+        final bytes = await selectedFile!.readAsBytes();
+        fileContent = docxToText(bytes);
+      } else if (selectedFile!.path.endsWith('.pdf')) {
+        // Use syncfusion_flutter_pdf to extract content
+        final pdfBytes = await selectedFile!.readAsBytes();
+        final pdfDocument = PdfDocument(inputBytes: pdfBytes);
+        fileContent = PdfTextExtractor(pdfDocument).extractText();
+      } else {
+        throw Exception('Unsupported file format');
       }
 
-      // Define the prompt for processing
-      String prompt = "Provide a summary and outlines for this document.";
+      // Process the file content using GeminiService
+      final geminiService = GeminiService();
+      final response = await geminiService.processDocument(fileContent);
 
-      // Show loading state
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        // Step 1: Upload the document to get the file ID
-        final fileId = await ApiService.uploadDocument(_pdfFile!);
-        if (fileId == null) {
-          ToastHelper.showToast("File upload failed. Please try again.");
-          return;
-        }
-
-        // Step 2: Use the file ID to generate content
-        final result = await ApiService.generateDocumentContent(fileId, prompt);
-        if (result == null) {
-          ToastHelper.showToast(
-              "Failed to process the file. Please try again.");
-          return;
-        }
-
-        // Step 3: Navigate to the result screen with summary and outlines
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SecondTabPaper(
-              summary: result['summary']!,
-              outlines: result['outlines']!,
-            ),
+      // Navigate to SecondTabPaper with response data
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SecondTabPaper(
+            summary: response['summary'],
+            outlines: response['outline'],
           ),
-        );
-      } on SocketException {
-        ToastHelper.showToast("Network error. Please check your connection.");
-      } on HttpException {
-        ToastHelper.showToast("Server error. Unable to process the file.");
-      } on FormatException {
-        ToastHelper.showToast("Invalid response format from the server.");
-      } catch (e) {
-        ToastHelper.showToast("An unexpected error occurred: $e");
-      } finally {
-        // Hide loading state
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } else {
-      ToastHelper.showToast("No file selected!");
+        ),
+      );
+    } catch (e) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error processing file: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -136,7 +98,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: _isLoading
+        padding: isLoading
             ? const EdgeInsets.all(0)
             : const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Scaffold(
@@ -153,10 +115,10 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                     ),
                     RichText(
                       text: const TextSpan(
-                        style: TextStyle(fontSize: 27), // Responsive font size
+                        style: TextStyle(fontSize: 27),
                         children: [
                           TextSpan(
-                              text: "Upload and scan your PDF with ",
+                              text: "Upload and scan your document with ",
                               style: TextStyle(
                                   color: Colors.black, fontFamily: "Poppins")),
                           TextSpan(
@@ -167,7 +129,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                                   fontFamily: "Poppins")),
                         ],
                       ),
-                      textAlign: TextAlign.left, // Align text to left
+                      textAlign: TextAlign.left,
                     ),
                     Container(
                       alignment: Alignment.center,
@@ -190,45 +152,44 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                               color: Colors.grey.shade200,
                               style: BorderStyle.solid),
                         ),
-                        child: _pdfFile == null
+                        child: selectedFile == null
                             ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.cloud_upload_outlined,
-                                    color: Colors.grey.shade400,
-                                    size: 50,
-                                  ),
-                                  Text(
-                                    "Click to upload",
-                                    style: TextStyle(
-                                      color: Colors.grey.shade400,
-                                      fontFamily: "Poppins",
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      overflow: TextOverflow.fade,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : const Text(
-                                'PDF Selected',
-                                style: TextStyle(
-                                  fontFamily: "Poppins",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.cloud_upload_outlined,
+                              color: Colors.grey.shade400,
+                              size: 50,
+                            ),
+                            Text(
+                              "Click to upload",
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
                               ),
+                            ),
+                          ],
+                        )
+                            : const Text(
+                          'File Selected',
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                     Padding(
                       padding:
-                          const EdgeInsets.only(left: 13, right: 13, top: 20),
+                      const EdgeInsets.only(left: 13, right: 13, top: 20),
                       child: Text(
-                        _pdfFile == null
-                            ? 'No PDF selected'
-                            : 'Selected PDF: ${_pdfFile!.path.split('/').last}',
+                        selectedFile == null
+                            ? 'No file selected'
+                            : 'Selected File: ${selectedFile!.path.split('/').last}',
                         style: const TextStyle(
                             fontFamily: "Poppins",
                             overflow: TextOverflow.clip,
@@ -236,7 +197,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                       ),
                     ),
                     InkWell(
-                      onTap: _isLoading ? null : processFile,
+                      onTap: isLoading ? null : processFile,
                       child: Container(
                         height: 50,
                         padding: const EdgeInsets.all(5),
@@ -248,7 +209,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                         ),
                         alignment: Alignment.center,
                         child: const Text(
-                          "Process PDF",
+                          "Process File",
                           style: TextStyle(
                             color: Colors.white,
                             fontFamily: "Poppins",
@@ -261,29 +222,24 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                   ],
                 ),
               ),
-              if (_isLoading)
+              if (isLoading)
                 Center(
                   child: Container(
                     decoration: const BoxDecoration(
-                        borderRadius:
-                            BorderRadius.all(Radius.circular(10)),
-                        color: Colors.white),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      color: Colors.white,
+                    ),
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          color: Colors.white
-                              .withOpacity(0.8), // Semi-transparent overlay
-                          alignment: Alignment.center,
-                          child: Lottie.asset(
-                            "assets/images/loading.json",
-                            repeat: true,
-                            fit: BoxFit.cover,
-                          ),
+                        Lottie.asset(
+                          "assets/images/loading.json",
+                          repeat: true,
+                          fit: BoxFit.cover,
                         ),
                         const Text(
-                          "Please wait until PDF process",
+                          "Please wait while the file is processed",
                           style: TextStyle(
                               fontSize: 18,
                               color: Colors.black,
