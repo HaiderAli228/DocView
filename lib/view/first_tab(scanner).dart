@@ -100,7 +100,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
       child: Padding(
         padding: isLoading
             ? const EdgeInsets.all(0)
-            : const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            : const EdgeInsets.symmetric(horizontal: 20,),
         child: Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
@@ -115,7 +115,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                     ),
                     RichText(
                       text: const TextSpan(
-                        style: TextStyle(fontSize: 27),
+                        style: TextStyle(fontSize: 25),
                         children: [
                           TextSpan(
                               text: "Upload and scan your document with ",
@@ -139,7 +139,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                     InkWell(
                       onTap: pickFile,
                       child: Container(
-                        height: 200,
+                        height: 170,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.all(5),
                         margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -230,6 +230,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                       color: Colors.white,
                     ),
                     alignment: Alignment.center,
+                    margin: const EdgeInsets.all(20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

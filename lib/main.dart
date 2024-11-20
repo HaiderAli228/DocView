@@ -2,9 +2,6 @@ import 'package:docsview/routes/routes.dart';
 import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import 'model/api_services.dart';
-
 void main() async {
 
   runApp(const MyApp());

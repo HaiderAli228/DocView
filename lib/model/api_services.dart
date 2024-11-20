@@ -97,7 +97,7 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
-  final String apiKey = ' ';
+  final String apiKey = '';
 
   Future<Map<String, dynamic>> processDocument(String fileContent) async {
     final model = GenerativeModel(
