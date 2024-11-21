@@ -1,5 +1,3 @@
 class ApiConstants {
-  static const String geminiApiEndpoint = "";
-  static const String apiKey =
-      ""; // Update with your actual API Key
+  static const String apiKey = "Your_apikey_here"; // Update with your actual API Key
 }
