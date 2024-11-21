@@ -10,7 +10,9 @@ import '../utils/app_colors.dart';
 import '../utils/toast_msg.dart';
 
 class FirstTabScanner extends StatefulWidget {
-  const FirstTabScanner({super.key});
+  final Function(String, String) onFileProcessed;
+
+  const FirstTabScanner({super.key, required this.onFileProcessed});
 
   @override
   State<FirstTabScanner> createState() => FirstTabScannerState();
@@ -52,14 +54,11 @@ class FirstTabScannerState extends State<FirstTabScanner> {
 
       // Check the file extension and read it accordingly
       if (selectedFile!.path.endsWith('.txt')) {
-        // Read text file
         fileContent = await selectedFile!.readAsString();
       } else if (selectedFile!.path.endsWith('.docx')) {
-        // Use docx_to_text to extract content
         final bytes = await selectedFile!.readAsBytes();
         fileContent = docxToText(bytes);
       } else if (selectedFile!.path.endsWith('.pdf')) {
-        // Use syncfusion_flutter_pdf to extract content
         final pdfBytes = await selectedFile!.readAsBytes();
         final pdfDocument = PdfDocument(inputBytes: pdfBytes);
         fileContent = PdfTextExtractor(pdfDocument).extractText();
@@ -71,18 +70,9 @@ class FirstTabScannerState extends State<FirstTabScanner> {
       final geminiService = GeminiService();
       final response = await geminiService.processDocument(fileContent);
 
-      // Navigate to SecondTabPaper with response data
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SecondTabPaper(
-            summary: response['summary'],
-            outlines: response['outline'],
-          ),
-        ),
-      );
+      // Update the SecondTab content via callback
+      widget.onFileProcessed(response['summary'], response['outline']);
     } catch (e) {
-      // Handle errors
       ToastHelper.showToast('Error processing file: $e');
     } finally {
       setState(() {

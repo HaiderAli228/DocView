@@ -1,4 +1,3 @@
-import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SecondTabPaper extends StatelessWidget {
@@ -11,13 +10,6 @@ class SecondTabPaper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Document Analysis',
-          style: TextStyle(fontFamily: "Poppins"),
-        ),
-        backgroundColor: AppColors.themeColor,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -52,7 +44,6 @@ class SecondTabPaper extends StatelessWidget {
     );
   }
 
-  // A method to build scrollable text blocks with appropriate styling
   Widget _buildScrollableText(String content) {
     return Container(
       padding: const EdgeInsets.all(12.0),
@@ -63,10 +54,7 @@ class SecondTabPaper extends StatelessWidget {
       ),
       child: Text(
         content,
-        style: const TextStyle(
-          fontSize: 16,
-          fontFamily: "Poppins",
-        ),
+        style: const TextStyle(fontSize: 16, fontFamily: "Poppins"),
         textAlign: TextAlign.justify,
       ),
     );
