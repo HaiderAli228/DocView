@@ -1,3 +1,4 @@
+import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SecondTabPaper extends StatelessWidget {
@@ -15,7 +16,7 @@ class SecondTabPaper extends StatelessWidget {
           'Document Analysis',
           style: TextStyle(fontFamily: "Poppins"),
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: AppColors.themeColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

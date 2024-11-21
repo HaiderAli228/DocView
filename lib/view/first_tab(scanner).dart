@@ -7,6 +7,7 @@ import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../model/api_services.dart';
 import '../utils/app_colors.dart';
+import '../utils/toast_msg.dart';
 
 class FirstTabScanner extends StatefulWidget {
   const FirstTabScanner({super.key});
@@ -38,9 +39,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
 
   Future<void> processFile() async {
     if (selectedFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a file to process.')),
-      );
+      ToastHelper.showToast("Please Select File");
       return;
     }
 
@@ -84,9 +83,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
       );
     } catch (e) {
       // Handle errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error processing file: $e')),
-      );
+      ToastHelper.showToast('Error processing file: $e');
     } finally {
       setState(() {
         isLoading = false;
@@ -100,7 +97,9 @@ class FirstTabScannerState extends State<FirstTabScanner> {
       child: Padding(
         padding: isLoading
             ? const EdgeInsets.all(0)
-            : const EdgeInsets.symmetric(horizontal: 20,),
+            : const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
         child: Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
@@ -154,38 +153,38 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                         ),
                         child: selectedFile == null
                             ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.cloud_upload_outlined,
-                              color: Colors.grey.shade400,
-                              size: 50,
-                            ),
-                            Text(
-                              "Click to upload",
-                              style: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                          ],
-                        )
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.cloud_upload_outlined,
+                                    color: Colors.grey.shade400,
+                                    size: 50,
+                                  ),
+                                  Text(
+                                    "Click to upload",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontFamily: "Poppins",
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              )
                             : const Text(
-                          'File Selected',
-                          style: TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                                'File Selected',
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                       ),
                     ),
                     Padding(
                       padding:
-                      const EdgeInsets.only(left: 13, right: 13, top: 20),
+                          const EdgeInsets.only(left: 13, right: 13, top: 20),
                       child: Text(
                         selectedFile == null
                             ? 'No file selected'
