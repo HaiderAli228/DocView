@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           primaryColor: AppColors.themeColor, primarySwatch: Colors.blue),
-      initialRoute: RoutesName.introScreenView,
+      initialRoute: RoutesName.splashScreenView,
       onGenerateRoute: Routes.generatedRoutes,
     );
   }
