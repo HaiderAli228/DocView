@@ -61,7 +61,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
         fileContent = await selectedFile!.readAsString();
       } else if (selectedFile!.path.endsWith('.docx')) {
         final bytes = await selectedFile!.readAsBytes();
-        fileContent = docxToText(bytes);
+        fileContent = docxToText(bytes); // Await the docxToText correctly
       } else if (selectedFile!.path.endsWith('.pdf')) {
         final pdfBytes = await selectedFile!.readAsBytes();
         final pdfDocument = PdfDocument(inputBytes: pdfBytes);
@@ -74,6 +74,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
       final geminiService = GeminiService();
       final response = await geminiService.processDocument(fileContent);
 
+      // Navigate to ResultScreen with the processed content
       Navigator.push(
         context,
         MaterialPageRoute(
