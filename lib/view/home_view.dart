@@ -17,30 +17,12 @@ class HomeViewState extends State<HomeView> {
   int _page = 0;
   final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
-  // Shared data to store response from FirstTabScanner
-  String? summary;
-  String? outlines;
-
-  // List of pages to display
-  late final List<Widget> _pages;
-
-  @override
-  void initState() {
-    super.initState();
-    _pages = [
-      FirstTabScanner(onFileProcessed: updateResponse), // Pass callback
-      SecondTabPaper(summary: summary, outlines: outlines),
-      const ThirdTabProfile(),
-    ];
-  }
-
-  void updateResponse(String newSummary, String newOutlines) {
-    setState(() {
-      summary = newSummary;
-      outlines = newOutlines;
-      _page = 1; // Switch to SecondTabPaper
-    });
-  }
+  // List of pages to display based on the selected index
+  final List<Widget> _pages = [
+    const FirstTabScanner(),
+    const SecondTabPaper(),
+    const ThirdTabProfile(),
+  ];
 
   @override
   Widget build(BuildContext context) {

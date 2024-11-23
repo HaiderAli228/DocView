@@ -1,5 +1,5 @@
+import 'package:docsview/view/response_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:docsview/view/second_tab(paper).dart';
 import 'package:docx_to_text/docx_to_text.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -10,32 +10,36 @@ import '../utils/app_colors.dart';
 import '../utils/toast_msg.dart';
 
 class FirstTabScanner extends StatefulWidget {
-  final Function(String, String) onFileProcessed;
-
-  const FirstTabScanner({super.key, required this.onFileProcessed});
+  const FirstTabScanner({super.key});
 
   @override
-  State<FirstTabScanner> createState() => FirstTabScannerState();
+  State<FirstTabScanner> createState() => _FirstTabScannerState();
 }
 
-class FirstTabScannerState extends State<FirstTabScanner> {
+class _FirstTabScannerState extends State<FirstTabScanner> {
   File? selectedFile;
   bool isLoading = false;
 
   Future<void> pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['txt', 'docx', 'pdf'], // Support multiple formats
-    );
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['txt', 'docx', 'pdf'], // Supported formats
+      );
 
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        selectedFile = File(result.files.single.path!); // Set the selected file
-      });
-    } else {
-      setState(() {
-        selectedFile = null; // No file selected
-      });
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          selectedFile = File(result.files.single.path!);
+        });
+        ToastHelper.showToast('File selected successfully.');
+      } else {
+        setState(() {
+          selectedFile = null;
+        });
+        ToastHelper.showToast('No file selected.');
+      }
+    } catch (e) {
+      ToastHelper.showToast('Error picking file: $e');
     }
   }
 
@@ -54,37 +58,29 @@ class FirstTabScannerState extends State<FirstTabScanner> {
 
       // Check the file extension and read it accordingly
       if (selectedFile!.path.endsWith('.txt')) {
-        // Read text file
         fileContent = await selectedFile!.readAsString();
       } else if (selectedFile!.path.endsWith('.docx')) {
-        // Use docx_to_text to extract content
         final bytes = await selectedFile!.readAsBytes();
         fileContent = docxToText(bytes);
       } else if (selectedFile!.path.endsWith('.pdf')) {
-        // Use syncfusion_flutter_pdf to extract content
         final pdfBytes = await selectedFile!.readAsBytes();
         final pdfDocument = PdfDocument(inputBytes: pdfBytes);
         fileContent = PdfTextExtractor(pdfDocument).extractText();
       } else {
-        throw Exception('Unsupported file format');
+        throw Exception('Unsupported file format.');
       }
 
       // Process the file content using GeminiService
       final geminiService = GeminiService();
       final response = await geminiService.processDocument(fileContent);
 
-      // Navigate to SecondTabPaper with response data
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SecondTabPaper(
-            summary: response['summary'],
-            outlines: response['outline'],
-          ),
+          builder: (context) => ResultScreen(response: response),
         ),
       );
     } catch (e) {
-      // Show error using toast
       ToastHelper.showToast('Error processing file: $e');
     } finally {
       setState(() {
@@ -97,23 +93,16 @@ class FirstTabScannerState extends State<FirstTabScanner> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: isLoading
-            ? const EdgeInsets.all(0)
-            : const EdgeInsets.symmetric(
-                horizontal: 20,
-              ),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
             children: [
               SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.02,
-                    ),
+                    const SizedBox(height: 20),
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(fontSize: 25),
@@ -130,10 +119,8 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                                   fontFamily: "Poppins")),
                         ],
                       ),
-                      textAlign: TextAlign.left,
                     ),
-                    Container(
-                      alignment: Alignment.center,
+                    Center(
                       child: Lottie.asset("assets/images/4.json",
                           height: 200, fit: BoxFit.cover),
                     ),
@@ -146,9 +133,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(10),
-                          ),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                               color: Colors.grey.shade200,
                               style: BorderStyle.solid),
@@ -173,9 +158,9 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                                   ),
                                 ],
                               )
-                            : const Text(
-                                'File Selected',
-                                style: TextStyle(
+                            : Text(
+                                'File Selected: ${selectedFile!.path.split('/').last}',
+                                style: const TextStyle(
                                   fontFamily: "Poppins",
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -184,29 +169,15 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                               ),
                       ),
                     ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 13, right: 13, top: 20),
-                      child: Text(
-                        selectedFile == null
-                            ? 'No file selected'
-                            : 'Selected File: ${selectedFile!.path.split('/').last}',
-                        style: const TextStyle(
-                            fontFamily: "Poppins",
-                            overflow: TextOverflow.clip,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    const SizedBox(height: 20),
                     InkWell(
                       onTap: isLoading ? null : processFile,
                       child: Container(
                         height: 50,
-                        padding: const EdgeInsets.all(5),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 20),
-                        decoration: const BoxDecoration(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
                           color: AppColors.themeColor,
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         alignment: Alignment.center,
                         child: const Text(
@@ -228,10 +199,9 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
                       color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
-                    alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -246,7 +216,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
                               fontSize: 18,
                               color: Colors.black,
                               fontFamily: "Poppins"),
-                        )
+                        ),
                       ],
                     ),
                   ),
