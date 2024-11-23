@@ -41,7 +41,7 @@ class FirstTabScannerState extends State<FirstTabScanner> {
 
   Future<void> processFile() async {
     if (selectedFile == null) {
-      ToastHelper.showToast("Please Select File");
+      ToastHelper.showToast('Please select a file to process.');
       return;
     }
 
@@ -54,11 +54,14 @@ class FirstTabScannerState extends State<FirstTabScanner> {
 
       // Check the file extension and read it accordingly
       if (selectedFile!.path.endsWith('.txt')) {
+        // Read text file
         fileContent = await selectedFile!.readAsString();
       } else if (selectedFile!.path.endsWith('.docx')) {
+        // Use docx_to_text to extract content
         final bytes = await selectedFile!.readAsBytes();
         fileContent = docxToText(bytes);
       } else if (selectedFile!.path.endsWith('.pdf')) {
+        // Use syncfusion_flutter_pdf to extract content
         final pdfBytes = await selectedFile!.readAsBytes();
         final pdfDocument = PdfDocument(inputBytes: pdfBytes);
         fileContent = PdfTextExtractor(pdfDocument).extractText();
@@ -70,9 +73,18 @@ class FirstTabScannerState extends State<FirstTabScanner> {
       final geminiService = GeminiService();
       final response = await geminiService.processDocument(fileContent);
 
-      // Update the SecondTab content via callback
-      widget.onFileProcessed(response['summary'], response['outline']);
+      // Navigate to SecondTabPaper with response data
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SecondTabPaper(
+            summary: response['summary'],
+            outlines: response['outline'],
+          ),
+        ),
+      );
     } catch (e) {
+      // Show error using toast
       ToastHelper.showToast('Error processing file: $e');
     } finally {
       setState(() {
@@ -214,12 +226,12 @@ class FirstTabScannerState extends State<FirstTabScanner> {
               if (isLoading)
                 Center(
                   child: Container(
+                    padding: const EdgeInsets.all(20),
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       color: Colors.white,
                     ),
                     alignment: Alignment.center,
-                    margin: const EdgeInsets.all(20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
