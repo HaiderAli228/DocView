@@ -13,8 +13,12 @@ class ResultScreen extends StatelessWidget {
         : (response['outlines'] as List<dynamic>? ?? []).cast<String>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Processing Results'),
+        title: const Text('Processing Results',style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontFamily: "Poppins",
+        ),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
