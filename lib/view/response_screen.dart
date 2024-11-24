@@ -1,3 +1,4 @@
+import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -15,9 +16,11 @@ class ResultScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: AppColors.themeColor,
         title: const Text('Processing Results',style: TextStyle(
           fontWeight: FontWeight.bold,
           fontFamily: "Poppins",
+          color: Colors.white
         ),),
       ),
       body: Padding(
