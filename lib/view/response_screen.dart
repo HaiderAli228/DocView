@@ -16,6 +16,8 @@ class _ResultScreenState extends State<ResultScreen> {
   bool showOutlines = false;
   bool showQuestions = false;
 
+  int currentOutlineIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -27,16 +29,35 @@ class _ResultScreenState extends State<ResultScreen> {
     });
   }
 
+  void _showNextOutline() {
+    if (currentOutlineIndex < outlines.length - 1) {
+      setState(() {
+        currentOutlineIndex++;
+      });
+    } else {
+      setState(() {
+        showQuestions = true; // Move to questions after all outlines
+      });
+    }
+  }
+
+  late final List<String> outlines;
+  late final String summary;
+  late final String questions;
+
   @override
-  Widget build(BuildContext context) {
-    // Parse outlines as a list of items
-    final List<String> outlines = widget.response['outlines'] is String
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Initialize response data
+    outlines = widget.response['outlines'] is String
         ? (widget.response['outlines'] as String).split('\n') // Assume newline-separated list
         : (widget.response['outlines'] as List<dynamic>? ?? []).cast<String>();
+    summary = widget.response['summary'] ?? 'No summary available.';
+    questions = widget.response['questions'] ?? 'No questions found.';
+  }
 
-    final String summary = widget.response['summary'] ?? 'No summary available.';
-    final String questions = widget.response['questions'] ?? 'No questions found.';
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -67,7 +88,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     TypewriterAnimatedText(
                       summary,
                       textStyle: const TextStyle(fontSize: 16),
-                      speed: const Duration(milliseconds: 10),
+                      speed: const Duration(milliseconds: 20),
                     ),
                   ],
                   isRepeatingAnimation: false,
@@ -84,43 +105,40 @@ class _ResultScreenState extends State<ResultScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                outlines.isNotEmpty
-                    ? Column(
-                  children: outlines.map((outline) {
-                    return AnimatedTextKit(
-                      animatedTexts: [
-                        TypewriterAnimatedText(
-                          '\u2022 $outline',
-                          textStyle: const TextStyle(fontSize: 16),
-                          speed: const Duration(milliseconds: 10),
-                        ),
-                      ],
-                      isRepeatingAnimation: false,
-                      onFinished: () {
-                        if (outline == outlines.last) {
-                          setState(() {
-                            showQuestions = true;
-                          });
-                        }
-                      },
-                    );
-                  }).toList(),
-                )
-                    : AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText(
-                      'No outline available.',
-                      textStyle: const TextStyle(fontSize: 16),
-                      speed: const Duration(milliseconds: 10),
-                    ),
-                  ],
-                  isRepeatingAnimation: false,
-                  onFinished: () {
-                    setState(() {
-                      showQuestions = true;
-                    });
-                  },
-                ),
+                if (outlines.isNotEmpty)
+                  Column(
+                    children: List.generate(currentOutlineIndex + 1, (index) {
+                      return AnimatedTextKit(
+                        animatedTexts: [
+                          TypewriterAnimatedText(
+                            '\u2022 ${outlines[index]}',
+                            textStyle: const TextStyle(fontSize: 16),
+                            speed: const Duration(milliseconds: 20),
+                          ),
+                        ],
+                        isRepeatingAnimation: false,
+                        onFinished: index == currentOutlineIndex
+                            ? _showNextOutline
+                            : null,
+                      );
+                    }),
+                  )
+                else
+                  AnimatedTextKit(
+                    animatedTexts: [
+                      TypewriterAnimatedText(
+                        'No outline available.',
+                        textStyle: const TextStyle(fontSize: 16),
+                        speed: const Duration(milliseconds: 20),
+                      ),
+                    ],
+                    isRepeatingAnimation: false,
+                    onFinished: () {
+                      setState(() {
+                        showQuestions = true;
+                      });
+                    },
+                  ),
               ],
               if (showQuestions) ...[
                 const SizedBox(height: 20),
@@ -134,7 +152,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     TypewriterAnimatedText(
                       questions,
                       textStyle: const TextStyle(fontSize: 16),
-                      speed: const Duration(milliseconds: 10),
+                      speed: const Duration(milliseconds: 20),
                     ),
                   ],
                   isRepeatingAnimation: false,
