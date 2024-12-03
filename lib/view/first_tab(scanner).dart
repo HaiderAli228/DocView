@@ -7,6 +7,7 @@ import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../model/api_services.dart';
 import '../utils/app_colors.dart';
+import '../utils/drawer_tile.dart';
 import '../utils/toast_msg.dart';
 
 class FirstTabScanner extends StatefulWidget {
@@ -93,17 +94,109 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Stack(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        drawer: Drawer(
+          backgroundColor: AppColors.backgroundBodyColor,
+          child: Column(
+            children: [
+              const UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: AppColors.themeColor),
+                accountName: Text(
+                  "Haider Ali",
+                  style: TextStyle(
+                      fontFamily: "Poppins", fontWeight: FontWeight.bold),
+                ),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Text(
+                    "PIC",
+                    style: TextStyle(
+                        color: AppColors.themeColor,
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                accountEmail: Text(
+                  "example@gmail.com",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                  ),
+                ),
+              ),
+              DrawerTile(
+                iconIs: const Icon(
+                  Icons.account_box,
+                  color: AppColors.themeColor,
+                ),
+                name: "Profile",
+                function: () {},
+              ),
+            ],
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Stack(
             children: [
               SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20,
+                        bottom: 15,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Drawer icon
+                          Builder(
+                            builder: (context) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                child: Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.themeColor.withOpacity(
+                                        0.1), // Light shade of themeColor
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.all(10),
+                                  child: const Icon(
+                                    Icons.menu,
+                                    color: AppColors.themeColor,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          // Notification icon
+                          GestureDetector(
+                            onTap: () {
+
+                            },
+                            child: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.themeColor
+                                    .withOpacity(0.1), // Light shade of themeColor
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.all(8),
+                              child: const Icon(Icons.notifications_active,
+                                  color: AppColors.themeColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(fontSize: 25),
@@ -121,17 +214,17 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                         ],
                       ),
                     ),
-                    Center(
-                      child: Lottie.asset("assets/images/4.json",
-                          height: 200, fit: BoxFit.cover),
-                    ),
+                    // Center(
+                    //   child: Lottie.asset("assets/images/4.json",
+                    //       height: 200, fit: BoxFit.cover),
+                    // ),
+                    const SizedBox(height: 20),
                     InkWell(
                       onTap: pickFile,
                       child: Container(
-                        height: 170,
+                        height: 150,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.all(5),
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(10),
@@ -174,8 +267,7 @@ class _FirstTabScannerState extends State<FirstTabScanner> {
                     InkWell(
                       onTap: isLoading ? null : processFile,
                       child: Container(
-                        height: 50,
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        height: 55,
                         decoration: BoxDecoration(
                           color: AppColors.themeColor,
                           borderRadius: BorderRadius.circular(6),

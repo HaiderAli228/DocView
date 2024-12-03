@@ -2,7 +2,6 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:docsview/utils/app_colors.dart';
 import 'package:docsview/view/first_tab(scanner).dart';
 import 'package:docsview/view/second_tab(paper).dart';
-import 'package:docsview/view/third_tab(profile).dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -21,7 +20,6 @@ class HomeViewState extends State<HomeView> {
   final List<Widget> _pages = [
     const FirstTabScanner(),
     const SecondTabPaper(),
-    const ThirdTabProfile(),
   ];
 
   @override
