@@ -18,10 +18,11 @@ class _ResultScreenState extends State<ResultScreen> {
 
   int currentOutlineIndex = 0;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    // Start by showing the summary animation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         showSummary = true;
@@ -29,16 +30,34 @@ class _ResultScreenState extends State<ResultScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void _showNextOutline() {
     if (currentOutlineIndex < outlines.length - 1) {
       setState(() {
         currentOutlineIndex++;
       });
+      _scrollToBottom();
     } else {
       setState(() {
         showQuestions = true; // Move to questions after all outlines
       });
+      _scrollToBottom();
     }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   late final List<String> outlines;
@@ -48,12 +67,15 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Initialize response data
     outlines = widget.response['outlines'] is String
-        ? (widget.response['outlines'] as String).split('\n') // Assume newline-separated list
+        ? (widget.response['outlines'] as String).split('\n')
         : (widget.response['outlines'] as List<dynamic>? ?? []).cast<String>();
     summary = widget.response['summary'] ?? 'No summary available.';
     questions = widget.response['questions'] ?? 'No questions found.';
+  }
+
+  String _formatOutline(String outline) {
+    return outline.replaceAll('*', '').trim();
   }
 
   @override
@@ -74,6 +96,7 @@ class _ResultScreenState extends State<ResultScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -96,6 +119,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     setState(() {
                       showOutlines = true;
                     });
+                    _scrollToBottom();
                   },
                 ),
               if (showOutlines) ...[
@@ -107,21 +131,27 @@ class _ResultScreenState extends State<ResultScreen> {
                 const SizedBox(height: 8),
                 if (outlines.isNotEmpty)
                   Column(
-                    children: List.generate(currentOutlineIndex + 1, (index) {
-                      return AnimatedTextKit(
-                        animatedTexts: [
-                          TypewriterAnimatedText(
-                            '\u2022 ${outlines[index]}',
-                            textStyle: const TextStyle(fontSize: 16),
-                            speed: const Duration(milliseconds: 20),
-                          ),
-                        ],
-                        isRepeatingAnimation: false,
-                        onFinished: index == currentOutlineIndex
-                            ? _showNextOutline
-                            : null,
-                      );
-                    }),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (int i = 0; i <= currentOutlineIndex; i++)
+                        AnimatedTextKit(
+                          animatedTexts: [
+                            TypewriterAnimatedText(
+                              _formatOutline(outlines[i]),
+                              textStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black,
+                              ),
+                              speed: const Duration(milliseconds: 20),
+                            ),
+                          ],
+                          isRepeatingAnimation: false,
+                          onFinished: i == currentOutlineIndex
+                              ? _showNextOutline
+                              : null,
+                        ),
+                    ],
                   )
                 else
                   AnimatedTextKit(
@@ -137,6 +167,7 @@ class _ResultScreenState extends State<ResultScreen> {
                       setState(() {
                         showQuestions = true;
                       });
+                      _scrollToBottom();
                     },
                   ),
               ],
@@ -156,6 +187,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     ),
                   ],
                   isRepeatingAnimation: false,
+                  onFinished: _scrollToBottom,
                 ),
               ],
             ],
