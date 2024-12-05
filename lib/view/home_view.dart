@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:docsview/view/ai_response_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:docx_to_text/docx_to_text.dart';
@@ -9,6 +10,7 @@ import '../model/api_services.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
 import '../utils/toast_msg.dart';
+
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -218,6 +220,23 @@ class _HomeViewState extends State<HomeView> {
                     //   child: Lottie.asset("assets/images/4.json",
                     //       height: 200, fit: BoxFit.cover),
                     // ),
+                    CarouselSlider(
+                      options: CarouselOptions(height: 400.0),
+                      items: [1,2,3,4,5].map((i) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Container(
+                                width: MediaQuery.of(context).size.width,
+                                margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.amber
+                                ),
+                                child: Text('text $i', style: TextStyle(fontSize: 16.0),)
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 20),
                     InkWell(
                       onTap: pickFile,

@@ -50,6 +50,7 @@ dependencies:
   fluttertoast: ^8.2.8
   syncfusion_flutter_pdf:
   animated_text_kit: ^4.2.2
+  carousel_slider: ^5.0.0
   docx_to_text:
 #  flutter_pdfview:
 
