@@ -92,7 +92,11 @@ class _HomeViewState extends State<HomeView> {
       });
     }
   }
-
+  final List<String> imagePaths = [
+    'assets/images/1.jpg', // Replace with your actual image paths
+    'assets/images/2.jpg',
+    'assets/images/3.jpg',
+  ];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -145,7 +149,6 @@ class _HomeViewState extends State<HomeView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     Padding(
                       padding: const EdgeInsets.only(
                         top: 20,
@@ -216,22 +219,36 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       ),
                     ),
-                    // Center(
-                    //   child: Lottie.asset("assets/images/4.json",
-                    //       height: 200, fit: BoxFit.cover),
-                    // ),
+                    const SizedBox(height: 10,),
                     CarouselSlider(
-                      options: CarouselOptions(height: 400.0),
-                      items: [1,2,3,4,5].map((i) {
+                      options: CarouselOptions(
+                        height: 320.0,
+                        autoPlay: true, // Enables auto-scrolling
+                        enlargeCenterPage: true, // Enlarges the current slide
+                      ),
+                      items: imagePaths.map((imagePath) {
                         return Builder(
                           builder: (BuildContext context) {
                             return Container(
-                                width: MediaQuery.of(context).size.width,
-                                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                decoration: BoxDecoration(
-                                    color: Colors.amber
+                              width: MediaQuery.of(context).size.width,
+                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 6.0,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image.asset(
+                                  imagePath,
+                                  fit: BoxFit.cover, // Ensures the image fits properly
                                 ),
-                                child: Text('text $i', style: TextStyle(fontSize: 16.0),)
+                              ),
                             );
                           },
                         );
