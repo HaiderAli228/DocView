@@ -231,13 +231,12 @@ class _HomeViewState extends State<HomeView> {
                           builder: (BuildContext context) {
                             return Container(
                               width: MediaQuery.of(context).size.width,
-                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(6.0),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 6.0,
+                                    blurRadius: 5.0,
                                     offset: const Offset(0, 3),
                                   ),
                                 ],
