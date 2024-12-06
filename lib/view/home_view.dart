@@ -11,7 +11,6 @@ import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
 import '../utils/toast_msg.dart';
 
-
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -92,6 +91,7 @@ class _HomeViewState extends State<HomeView> {
       });
     }
   }
+
   final List<String> imagePaths = [
     'assets/images/1.jpg', // Replace with your actual image paths
     'assets/images/2.jpg',
@@ -183,15 +183,13 @@ class _HomeViewState extends State<HomeView> {
                           ),
                           // Notification icon
                           GestureDetector(
-                            onTap: () {
-
-                            },
+                            onTap: () {},
                             child: Container(
                               height: 50,
                               width: 50,
                               decoration: BoxDecoration(
-                                color: AppColors.themeColor
-                                    .withOpacity(0.1), // Light shade of themeColor
+                                color: AppColors.themeColor.withOpacity(
+                                    0.1), // Light shade of themeColor
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               padding: const EdgeInsets.all(8),
@@ -219,7 +217,9 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10,),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     CarouselSlider(
                       options: CarouselOptions(
                         height: 320.0,
@@ -245,7 +245,8 @@ class _HomeViewState extends State<HomeView> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 child: Image.asset(
                                   imagePath,
-                                  fit: BoxFit.cover, // Ensures the image fits properly
+                                  fit: BoxFit
+                                      .cover, // Ensures the image fits properly
                                 ),
                               ),
                             );
@@ -350,6 +351,14 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 40,
           ),
         ),
       ),
