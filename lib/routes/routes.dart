@@ -1,4 +1,5 @@
 import 'package:docsview/routes/routes_name.dart';
+import 'package:docsview/view/ai_view.dart';
 import 'package:docsview/view/intro_screen.dart';
 import 'package:flutter/material.dart';
 import '../view/home_view.dart';
@@ -11,6 +12,8 @@ class Routes {
         return _createRoute(const HomeView());
       case RoutesName.splashScreenView:
         return _createRoute(const SplashScreen());
+      case RoutesName.aiScreenView:
+        return _createRoute(const AiView());
       case RoutesName.introScreenView:
         return _createRoute(const IntroScreen());
       default:
