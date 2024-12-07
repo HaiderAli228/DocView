@@ -19,16 +19,15 @@ class _HomeViewState extends State<HomeView> {
   ];
 
   final List<Map<String, String>> departments = [
-    {"name": "Computer", "icon": "assets/icons/computer.png"},
-    {"name": "Physics", "icon": "assets/icons/physics.png"},
-    {"name": "Chemistry", "icon": "assets/icons/chemistry.png"},
-    {"name": "Botany", "icon": "assets/icons/botany.png"},
-    {"name": "Zoology", "icon": "assets/icons/zoology.png"},
-    {"name": "Mathematics", "icon": "assets/icons/math.png"},
-    {"name": "Islamist", "icon": "assets/icons/islamic.png"},
-    {"name": "Urdu", "icon": "assets/icons/urdu.png"},
-    {"name": "English", "icon": "assets/icons/english.png"},
-    {"name": "Economics", "icon": "assets/icons/economics.png"},
+    {"name": "Computer", "icon": "assets/images/computer.png"},
+    {"name": "Physics", "icon": "assets/images/physics.png"},
+    {"name": "Chemistry", "icon": "assets/images/chemistry.png"},
+    {"name": "Botany", "icon": "assets/images/botany.png"},
+    {"name": "Zoology", "icon": "assets/images/zoology.png"},
+    {"name": "Mathematics", "icon": "assets/images/math.png"},
+    {"name": "Islamist", "icon": "assets/images/islam.png"},
+    {"name": "English", "icon": "assets/images/english.png"},
+    {"name": "Economics", "icon": "assets/images/bba.png"},
   ];
 
   @override
@@ -196,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
                         crossAxisCount: crossAxisCount,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
-                        childAspectRatio: 0.85, // Adjust height-to-width ratio
+                        childAspectRatio: 1.1, // Adjust height-to-width ratio
                       ),
                       itemCount: departments.length,
                       itemBuilder: (context, index) {
@@ -236,6 +235,9 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         );
                       },
+                    ),
+                    const SizedBox(
+                      height: 20,
                     ),
                   ],
                 ),
