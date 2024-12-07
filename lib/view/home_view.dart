@@ -1,16 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:docsview/routes/routes_name.dart';
-import 'package:docsview/view/ai_response_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:docx_to_text/docx_to_text.dart';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:lottie/lottie.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-import '../model/api_services.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
-import '../utils/toast_msg.dart';
+
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -184,7 +177,15 @@ class _HomeViewState extends State<HomeView> {
                         );
                       }).toList(),
                     ),
-
+                    Container(
+                      height: 100,
+                      width: 100,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.all( Radius.circular(10))
+                      ),
+                    )
                   ],
                 ),
               ),

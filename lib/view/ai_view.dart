@@ -94,6 +94,7 @@ class _AiViewState extends State<AiView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         backgroundColor: AppColors.themeColor,
         title: const Text("AI Assistant",style: TextStyle(
           color: Colors.white,
@@ -103,106 +104,109 @@ class _AiViewState extends State<AiView> {
         ),),
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              const SizedBox(height: 20),
-              InkWell(
-                onTap: pickFile,
-                child: Container(
-                  height: 150,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: Colors.grey.shade200,
-                        style: BorderStyle.solid),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                const SizedBox(height: 20),
+                InkWell(
+                  onTap: pickFile,
+                  child: Container(
+                    height: 150,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: Colors.grey.shade200,
+                          style: BorderStyle.solid),
+                    ),
+                    child: selectedFile == null
+                        ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload_outlined,
+                          color: Colors.grey.shade400,
+                          size: 50,
+                        ),
+                        Text(
+                          "Click to upload",
+                          style: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    )
+                        : Text(
+                      'File Selected: ${selectedFile!.path.split('/').last}',
+                      style: const TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  child: selectedFile == null
-                      ? Column(
+                ),
+                const SizedBox(height: 20),
+                InkWell(
+                  onTap: isLoading ? null : processFile,
+                  child: Container(
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: AppColors.themeColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      "Process File",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "Poppins",
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (isLoading)
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.cloud_upload_outlined,
-                        color: Colors.grey.shade400,
-                        size: 50,
+                      Lottie.asset(
+                        "assets/images/loading.json",
+                        repeat: true,
+                        fit: BoxFit.cover,
                       ),
-                      Text(
-                        "Click to upload",
+                      const Text(
+                        "Please wait while the file is processed",
                         style: TextStyle(
-                          color: Colors.grey.shade400,
-                          fontFamily: "Poppins",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
+                            fontSize: 18,
+                            color: Colors.black,
+                            fontFamily: "Poppins"),
                       ),
                     ],
-                  )
-                      : Text(
-                    'File Selected: ${selectedFile!.path.split('/').last}',
-                    style: const TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              InkWell(
-                onTap: isLoading ? null : processFile,
-                child: Container(
-                  height: 55,
-                  decoration: BoxDecoration(
-                    color: AppColors.themeColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    "Process File",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: "Poppins",
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (isLoading)
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Lottie.asset(
-                      "assets/images/loading.json",
-                      repeat: true,
-                      fit: BoxFit.cover,
-                    ),
-                    const Text(
-                      "Please wait while the file is processed",
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontFamily: "Poppins"),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ]
+          ]
+        ),
       ),
     );
   }
