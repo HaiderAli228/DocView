@@ -51,6 +51,9 @@ dependencies:
   syncfusion_flutter_pdf:
   animated_text_kit: ^4.2.2
   carousel_slider: ^5.0.0
+  firebase_auth: ^5.3.4
+  firebase_core: ^3.8.1
+  cloud_firestore: ^5.5.1
   docx_to_text:
 #  flutter_pdfview:
 

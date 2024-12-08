@@ -1,9 +1,15 @@
 import 'package:docsview/routes/routes.dart';
 import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/utils/app_colors.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-void main() async {
 
+import 'firebase_options.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized() ;
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

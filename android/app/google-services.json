@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "700087777412",
+    "project_id": "docsview-5f2a3",
+    "storage_bucket": "docsview-5f2a3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700087777412:android:a2ee60898cc374647dead1",
+        "android_client_info": {
+          "package_name": "com.example.docsview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFEI9TDti-4CefEVwWl3634MY0-mh_Ng4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
