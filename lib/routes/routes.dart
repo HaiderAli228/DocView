@@ -2,26 +2,37 @@ import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/view/ai_view.dart';
 import 'package:docsview/view/intro_screen.dart';
 import 'package:flutter/material.dart';
+import '../view/deptDetail.dart';
 import '../view/home_view.dart';
 import '../view/splash_screen.dart';
 
 class Routes {
-  static Route<dynamic> generatedRoutes(RouteSettings setting) {
-    switch (setting.name) {
+  static Route<dynamic> generatedRoutes(RouteSettings settings) {
+    switch (settings.name) {
       case RoutesName.homeScreenView:
         return _createRoute(const HomeView());
+
+      case RoutesName.deptDetailView:
+        if (settings.arguments is Map<String, String>) {
+          final department = settings.arguments as Map<String, String>;
+          return _createRoute(DeptDetailView(
+            departmentName: department['name']!,
+          ));
+        } else {
+          return _errorRoute("Invalid department data");
+        }
+
       case RoutesName.splashScreenView:
         return _createRoute(const SplashScreen());
+
       case RoutesName.aiScreenView:
         return _createRoute(const AiView());
+
       case RoutesName.introScreenView:
         return _createRoute(const IntroScreen());
+
       default:
-        return _createRoute(
-          const Scaffold(
-            body: Center(child: Text("Route Not Found")),
-          ),
-        );
+        return _errorRoute("Route Not Found");
     }
   }
 
@@ -58,7 +69,16 @@ class Routes {
       },
       transitionDuration: const Duration(milliseconds: 700), // Smooth speed
       reverseTransitionDuration:
-          const Duration(milliseconds: 700), // Smooth for pop too
+      const Duration(milliseconds: 700), // Smooth for pop too
+    );
+  }
+
+  // Helper function to handle errors
+  static Route<dynamic> _errorRoute(String message) {
+    return MaterialPageRoute(
+      builder: (context) => Scaffold(
+        body: Center(child: Text(message)),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:docsview/routes/routes_name.dart';
+import 'package:docsview/view/deptDetail.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
@@ -103,7 +104,8 @@ class _HomeViewState extends State<HomeView> {
                                   height: 50,
                                   width: 50,
                                   decoration: BoxDecoration(
-                                    color: AppColors.themeColor.withOpacity(0.1),
+                                    color:
+                                        AppColors.themeColor.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   padding: const EdgeInsets.all(10),
@@ -137,11 +139,11 @@ class _HomeViewState extends State<HomeView> {
                         style: TextStyle(fontSize: 25),
                         children: [
                           TextSpan(
-                              text: "Upload and scan your document with ",
+                              text: "Code your path to success with ",
                               style: TextStyle(
                                   color: Colors.black, fontFamily: "Poppins")),
                           TextSpan(
-                              text: "DocView",
+                              text: "CS Department",
                               style: TextStyle(
                                   color: AppColors.themeColor,
                                   fontWeight: FontWeight.bold,
@@ -193,45 +195,55 @@ class _HomeViewState extends State<HomeView> {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 20,
                         childAspectRatio: 1.1, // Adjust height-to-width ratio
                       ),
                       itemCount: departments.length,
                       itemBuilder: (context, index) {
                         final department = departments[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                blurRadius: 6,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                department['icon']!,
-                                height: 50,
-                                width: 50,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                department['name']!,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontFamily: "Poppins",
-                                  fontWeight: FontWeight.bold,
+                        return InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              RoutesName.deptDetailView,
+                              arguments: {'name': department['name']!},
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  department['icon']!,
+                                  height: 50,
+                                  width: 50,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  department['name']!,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
