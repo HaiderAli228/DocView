@@ -9,7 +9,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../model/api_services.dart';
 import '../utils/toast_msg.dart';
-import 'ai_response_screen.dart';
+import 'ai_response_view.dart';
 class AiView extends StatefulWidget {
   const AiView({super.key});
 

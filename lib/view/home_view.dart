@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:docsview/routes/routes_name.dart';
-import 'package:docsview/view/deptDetail.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
@@ -9,17 +8,17 @@ class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  State<HomeView> createState() => HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class HomeViewState extends State<HomeView> {
   final List<String> imagePaths = [
     'assets/images/1.jpg',
     'assets/images/2.jpg',
     'assets/images/3.jpg',
   ];
 
-  final List<Map<String, String>> departments = [
+   static List<Map<String, String>> departments = [
     {"name": "Computer", "icon": "assets/images/computer.png"},
     {"name": "Physics", "icon": "assets/images/physics.png"},
     {"name": "Chemistry", "icon": "assets/images/chemistry.png"},
@@ -35,7 +34,6 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final int crossAxisCount = screenWidth < 600 ? 2 : 4;
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -207,7 +205,10 @@ class _HomeViewState extends State<HomeView> {
                             Navigator.pushNamed(
                               context,
                               RoutesName.deptDetailView,
-                              arguments: {'name': department['name']!},
+                              arguments: {
+                                'name': department['name']!,
+                                'icon': department['icon']!,
+                              },
                             );
                           },
                           child: Container(
@@ -217,7 +218,7 @@ class _HomeViewState extends State<HomeView> {
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
+                                  color: Colors.grey.withOpacity(0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),

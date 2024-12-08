@@ -1,9 +1,10 @@
 import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/view/ai_view.dart';
-import 'package:docsview/view/intro_screen.dart';
+import 'package:docsview/view/intro_view.dart';
 import 'package:flutter/material.dart';
-import '../view/deptDetail.dart';
+import '../view/dept_detail_view.dart';
 import '../view/home_view.dart';
+import '../view/semester_detail_view.dart';
 import '../view/splash_screen.dart';
 
 class Routes {
@@ -17,6 +18,17 @@ class Routes {
           final department = settings.arguments as Map<String, String>;
           return _createRoute(DeptDetailView(
             departmentName: department['name']!,
+            departmentIcon: department['icon']!,
+          ));
+        } else {
+          return _errorRoute("Invalid department data");
+        }
+        case RoutesName.semesterDetailView:
+        if (settings.arguments is Map<String, String>) {
+          final department = settings.arguments as Map<String, String>;
+          return _createRoute(SemesterDetailView(
+            departmentName: department['name']!,
+            departmentIcon: department['icon']!,
           ));
         } else {
           return _errorRoute("Invalid department data");
@@ -67,9 +79,9 @@ class Routes {
           ),
         );
       },
-      transitionDuration: const Duration(milliseconds: 700), // Smooth speed
+      transitionDuration: const Duration(milliseconds: 500), // Smooth speed
       reverseTransitionDuration:
-      const Duration(milliseconds: 700), // Smooth for pop too
+      const Duration(milliseconds: 500), // Smooth for pop too
     );
   }
 
