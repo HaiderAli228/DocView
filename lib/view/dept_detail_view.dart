@@ -14,14 +14,14 @@ class DeptDetailView extends StatelessWidget {
   });
 
   final semesterDetails = [
-    {'icon': Icons.looks_one, 'name': "Semester 1"},
-    {'icon': Icons.looks_two, 'name': "Semester 2"},
-    {'icon': Icons.looks_3, 'name': "Semester 3"},
-    {'icon': Icons.looks_4, 'name': "Semester 4"},
-    {'icon': Icons.looks_5, 'name': "Semester 5"},
-    {'icon': Icons.looks_6, 'name': "Semester 6"},
-    {'icon': Icons.auto_graph, 'name': "Semester 7"},
-    {'icon': Icons.workspace_premium, 'name': "Semester 8"},
+    {'icon': Icons.looks_one, 'name': "Semester"},
+    {'icon': Icons.looks_two, 'name': "Semester"},
+    {'icon': Icons.looks_3, 'name': "Semester"},
+    {'icon': Icons.looks_4, 'name': "Semester"},
+    {'icon': Icons.looks_5, 'name': "Semester"},
+    {'icon': Icons.looks_6, 'name': "Semester"},
+    {'icon': Icons.auto_graph, 'name': "Research \nSemester"},
+    {'icon': Icons.workspace_premium, 'name': "    Final \nSemester"},
   ];
 
   @override

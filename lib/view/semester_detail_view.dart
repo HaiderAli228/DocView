@@ -74,24 +74,8 @@ class SemesterDetailView extends StatelessWidget {
                   children: [
                     _buildOptionCard(
                       context,
-                      icon: Icons.assignment_outlined,
-                      label: "MIS Past Papers",
-                      onTap: () {
-                        // Navigate to MIS Past Papers
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.library_books_outlined,
-                      label: "Final Past Papers",
-                      onTap: () {
-                        // Navigate to Final Past Papers
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
                       icon: Icons.book,
-                      label: "Books of Semester",
+                      label: "Semester Books",
                       onTap: () {
                         // Navigate to Books of Semester
                       },
@@ -106,8 +90,25 @@ class SemesterDetailView extends StatelessWidget {
                     ),
                     _buildOptionCard(
                       context,
+                      icon: Icons.assignment_outlined,
+                      label: "Mid Past Papers",
+                      onTap: () {
+                        // Navigate to MIS Past Papers
+                      },
+                    ),
+                    _buildOptionCard(
+                      context,
+                      icon: Icons.library_books_outlined,
+                      label: "Final Past Papers",
+                      onTap: () {
+                        // Navigate to Final Past Papers
+                      },
+                    ),
+
+                    _buildOptionCard(
+                      context,
                       icon: Icons.task,
-                      label: "Assignments",
+                      label: "Time Table",
                       onTap: () {
                         // Navigate to Assignments
                       },
@@ -123,19 +124,12 @@ class SemesterDetailView extends StatelessWidget {
                     _buildOptionCard(
                       context,
                       icon: Icons.quiz_outlined,
-                      label: "Practice Questions",
+                      label: "Imp Questions",
                       onTap: () {
                         // Navigate to Practice Questions
                       },
                     ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.more_horiz,
-                      label: "More Options",
-                      onTap: () {
-                        // Navigate to More Options
-                      },
-                    ),
+
                   ],
                 ),
               ),
