@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../utils/app_colors.dart';
+import '../utils/custom_card.dart';
 
 class SemesterDetailView extends StatelessWidget {
   final String departmentName;
@@ -71,66 +71,7 @@ class SemesterDetailView extends StatelessWidget {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
-                  children: [
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.book,
-                      label: "Semester Books",
-                      onTap: () {
-                        // Navigate to Books of Semester
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.description_outlined,
-                      label: "Book Outlines",
-                      onTap: () {
-                        // Navigate to Book Outlines
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.assignment_outlined,
-                      label: "Mid Past Papers",
-                      onTap: () {
-                        // Navigate to MIS Past Papers
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.library_books_outlined,
-                      label: "Final Past Papers",
-                      onTap: () {
-                        // Navigate to Final Past Papers
-                      },
-                    ),
-
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.task,
-                      label: "Time Table",
-                      onTap: () {
-                        // Navigate to Assignments
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.note,
-                      label: "Lecture Notes",
-                      onTap: () {
-                        // Navigate to Lecture Notes
-                      },
-                    ),
-                    _buildOptionCard(
-                      context,
-                      icon: Icons.quiz_outlined,
-                      label: "Imp Questions",
-                      onTap: () {
-                        // Navigate to Practice Questions
-                      },
-                    ),
-
-                  ],
+                  children: _buildCards(context),
                 ),
               ),
             ],
@@ -140,39 +81,23 @@ class SemesterDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildOptionCard(BuildContext context,
-      {required IconData icon, required String label, required VoidCallback onTap}) {
-    return Card(
-      elevation: 6,
-      color: Colors.white,
-      shadowColor: Colors.grey.withOpacity(0.4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 40,
-              color: AppColors.themeColor,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
+  List<Widget> _buildCards(BuildContext context) {
+    return [
+      _buildOptionCard(context, Icons.book, "Semester Books", () {}),
+      _buildOptionCard(context, Icons.description_outlined, "Book Outlines", () {}),
+      _buildOptionCard(context, Icons.assignment_outlined, "Mid Past Papers", () {}),
+      _buildOptionCard(context, Icons.library_books_outlined, "Final Past Papers", () {}),
+      _buildOptionCard(context, Icons.task, "Time Table", () {}),
+      _buildOptionCard(context, Icons.note, "Lecture Notes", () {}),
+      _buildOptionCard(context, Icons.quiz_outlined, "Imp Questions", () {}),
+    ];
+  }
+
+  Widget _buildOptionCard(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    return CustomCard(
+      icon: icon,
+      label: label,
+      onTap: onTap,
     );
   }
 }
