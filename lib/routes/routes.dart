@@ -1,4 +1,11 @@
 import 'package:docsview/routes/routes_name.dart';
+import 'package:docsview/view/SemesterDetailView/book_outlines.dart';
+import 'package:docsview/view/SemesterDetailView/final_past_paper.dart';
+import 'package:docsview/view/SemesterDetailView/imp_question.dart';
+import 'package:docsview/view/SemesterDetailView/lecture_notes.dart';
+import 'package:docsview/view/SemesterDetailView/mid_past_paper.dart';
+import 'package:docsview/view/SemesterDetailView/semester_book.dart';
+import 'package:docsview/view/SemesterDetailView/time_table.dart';
 import 'package:docsview/view/ai_view.dart';
 import 'package:docsview/view/intro_view.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +17,6 @@ import '../view/splash_screen.dart';
 class Routes {
   static Route<dynamic> generatedRoutes(RouteSettings settings) {
     switch (settings.name) {
-      case RoutesName.homeScreenView:
-        return _createRoute(const HomeView());
-
       case RoutesName.deptDetailView:
         if (settings.arguments is Map<String, String>) {
           final department = settings.arguments as Map<String, String>;
@@ -23,7 +27,7 @@ class Routes {
         } else {
           return _errorRoute("Invalid department data");
         }
-        case RoutesName.semesterDetailView:
+      case RoutesName.semesterDetailView:
         if (settings.arguments is Map<String, String>) {
           final department = settings.arguments as Map<String, String>;
           return _createRoute(SemesterDetailView(
@@ -33,9 +37,32 @@ class Routes {
         } else {
           return _errorRoute("Invalid department data");
         }
+      case RoutesName.homeScreenView:
+        return _createRoute(const HomeView());
 
       case RoutesName.splashScreenView:
         return _createRoute(const SplashScreen());
+
+      case RoutesName.semesterBookDetailView:
+        return _createRoute(const SemesterBookDetail());
+
+      case RoutesName.semesterFinalPaperDetailView:
+        return _createRoute(const SemesterFinalPaperDetail());
+
+      case RoutesName.semesterMidPaperDetailView:
+        return _createRoute(const SemesterMidPaperDetail());
+
+      case RoutesName.semesterTTableDetailView:
+        return _createRoute(const SemesterTTableDetail());
+
+      case RoutesName.semesterImpQusDetailView:
+        return _createRoute(const SemesterImpQuestionDetail());
+
+      case RoutesName.semesterNotesDetailView:
+        return _createRoute(const SemesterNotesDetail());
+
+      case RoutesName.semesterOutlinesDetailView:
+        return _createRoute(const SemesterBookOutlinesDetail());
 
       case RoutesName.aiScreenView:
         return _createRoute(const AiView());
@@ -81,7 +108,7 @@ class Routes {
       },
       transitionDuration: const Duration(milliseconds: 500), // Smooth speed
       reverseTransitionDuration:
-      const Duration(milliseconds: 500), // Smooth for pop too
+          const Duration(milliseconds: 500), // Smooth for pop too
     );
   }
 
