@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../utils/custom_card.dart';
+import '../routes/routes_name.dart';
 
 class SemesterDetailView extends StatelessWidget {
   final String departmentName;
@@ -83,17 +84,67 @@ class SemesterDetailView extends StatelessWidget {
 
   List<Widget> _buildCards(BuildContext context) {
     return [
-      _buildOptionCard(context, Icons.book, "Semester Books", () {}),
-      _buildOptionCard(context, Icons.description_outlined, "Book Outlines", () {}),
-      _buildOptionCard(context, Icons.assignment_outlined, "Mid Past Papers", () {}),
-      _buildOptionCard(context, Icons.library_books_outlined, "Final Past Papers", () {}),
-      _buildOptionCard(context, Icons.task, "Time Table", () {}),
-      _buildOptionCard(context, Icons.note, "Lecture Notes", () {}),
-      _buildOptionCard(context, Icons.quiz_outlined, "Imp Questions", () {}),
+      _buildOptionCard(
+        context,
+        Icons.book,
+        "Semester Books",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterBookDetailView);
+        },
+      ),
+      _buildOptionCard(
+        context,
+        Icons.description_outlined,
+        "Book Outlines",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterOutlinesDetailView);
+        },
+      ),
+      _buildOptionCard(
+        context,
+        Icons.assignment_outlined,
+        "Mid Past Papers",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterMidPaperDetailView);
+        },
+      ),
+      _buildOptionCard(
+        context,
+        Icons.library_books_outlined,
+        "Final Past Papers",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterFinalPaperDetailView);
+        },
+      ),
+      _buildOptionCard(
+        context,
+        Icons.task,
+        "Time Table",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterTTableDetailView);
+        },
+      ),
+      _buildOptionCard(
+        context,
+        Icons.note,
+        "Lecture Notes",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterNotesDetailView);
+        },
+      ),
+      _buildOptionCard(
+        context,
+        Icons.quiz_outlined,
+        "Imp Questions",
+            () {
+          Navigator.pushNamed(context, RoutesName.semesterImpQusDetailView);
+        },
+      ),
     ];
   }
 
-  Widget _buildOptionCard(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+  Widget _buildOptionCard(
+      BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return CustomCard(
       icon: icon,
       label: label,
