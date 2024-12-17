@@ -63,7 +63,10 @@ class Routes {
         return _createRoute(const SemesterNotesDetail());
 
       case RoutesName.semesterOutlinesDetailView:
-        return _createRoute(const SemesterBookOutlinesDetail());
+        return _createRoute(const SemesterBookOutlinesDetail(
+          department: 'ComputerScience',
+          semester: 'semester1',
+        ),);
 
       case RoutesName.aiScreenView:
         return _createRoute(const AiView());
