@@ -55,6 +55,7 @@ dependencies:
   firebase_core: ^3.8.1
   cloud_firestore: ^5.5.1
   docx_to_text:
+  url_launcher:
 #  flutter_pdfview:
 
 dev_dependencies:
