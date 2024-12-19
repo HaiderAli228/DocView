@@ -3,14 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SemesterBookOutlinesDetail extends StatelessWidget {
-  final String department; // Example: "ComputerScience"
-  final String semester; // Example: "Semester1"
-
-  const SemesterBookOutlinesDetail({
-    required this.department,
-    required this.semester,
-    super.key,
-  });
+  const SemesterBookOutlinesDetail({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,27 +15,31 @@ class SemesterBookOutlinesDetail extends StatelessWidget {
         ),
         body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
-              .collection('Departments')
-              .doc(department)
-              .collection('semester')
-              .doc(semester)
-              .collection('resources')
-              .doc('outline') // Access the specific document named "outline"
+              .collection('departments')
+              .doc("ComputerScience")
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
+              print("Error: ${snapshot.error}");
               return const Center(child: Text('Error loading outline'));
             }
             if (!snapshot.hasData || !snapshot.data!.exists) {
+              print("No data found for the document.");
               return const Center(child: Text('No outline available'));
             }
 
+            // Parse document data
             final data = snapshot.data!.data() as Map<String, dynamic>;
+            final downloadUrl = data['url'];
             final title = data['title'] ?? 'Untitled';
-            final downloadUrl = data['download_url'];
+
+            if (downloadUrl == null) {
+              print("Missing 'url' in document data.");
+              return const Center(child: Text('No valid URL available'));
+            }
 
             return ListView(
               children: [
@@ -51,13 +48,7 @@ class SemesterBookOutlinesDetail extends StatelessWidget {
                   title: Text(title),
                   subtitle: const Text('Tap to view or download'),
                   onTap: () {
-                    if (downloadUrl != null) {
-                      _openDownloadUrl(context, downloadUrl);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No download URL available')),
-                      );
-                    }
+                    _openDownloadUrl(context, downloadUrl);
                   },
                 ),
               ],
@@ -95,7 +86,7 @@ class SemesterBookOutlinesDetail extends StatelessWidget {
     try {
       final uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         throw 'Could not launch $url';
       }
