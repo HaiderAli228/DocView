@@ -48,6 +48,7 @@ dependencies:
   lottie: ^3.1.3
   syncfusion_flutter_pdfviewer:
   fluttertoast: ^8.2.8
+  googleapis:
   syncfusion_flutter_pdf:
   animated_text_kit: ^4.2.2
   carousel_slider: ^5.0.0
