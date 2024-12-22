@@ -2,19 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String apiKey = "AIzaSyCFozPWxi82_xGm011yJsQ5eZocFNLrKzU"; // Replace with your API key
-const String rootFolderId = "1CqXi8YcJCufzyldxkQqx72tFEyWfYBbj"; // Replace with your App Data folder ID
+c // Replace with your root folder ID
 
-class DriveExplorer extends StatefulWidget {
-  const DriveExplorer({super.key});
+class ResultScreen extends StatefulWidget {
+  const ResultScreen({super.key});
 
   @override
-  DriveExplorerState createState() => DriveExplorerState();
+  ResultScreenState createState() => ResultScreenState();
 }
 
-class DriveExplorerState extends State<DriveExplorer> {
+class ResultScreenState extends State<ResultScreen> {
   String currentFolderId = rootFolderId; // Start at the root folder
-  String currentFolderName = "App Data"; // Display folder name
+  String currentFolderName = "Root Folder"; // Display folder name
   List<dynamic> folderContents = [];
   bool isLoading = false;
   String? errorMessage;
@@ -22,9 +21,11 @@ class DriveExplorerState extends State<DriveExplorer> {
   @override
   void initState() {
     super.initState();
+    print("initState: Starting to fetch folder contents");
     fetchFolderContents(currentFolderId);
   }
 
+  // Recursive function to fetch folder contents
   Future<void> fetchFolderContents(String folderId) async {
     setState(() {
       isLoading = true;
@@ -32,24 +33,31 @@ class DriveExplorerState extends State<DriveExplorer> {
     });
 
     final String url =
-        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents&key=$apiKey&fields=files(id,name,mimeType)";
+        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+    print("fetchFolderContents: URL is $url");
 
     try {
       final response = await http.get(Uri.parse(url));
+      print("fetchFolderContents: Response status is ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print("fetchFolderContents: Response data is $data");
+
         setState(() {
           folderContents = data['files'] ?? [];
           isLoading = false;
         });
+        print("fetchFolderContents: Successfully fetched folder contents");
       } else {
+        print("fetchFolderContents: Error - ${response.statusCode} ${response.reasonPhrase}");
         setState(() {
           errorMessage = "Error: ${response.statusCode} ${response.reasonPhrase}";
           isLoading = false;
         });
       }
     } catch (e) {
+      print("fetchFolderContents: Exception caught - $e");
       setState(() {
         errorMessage = "An error occurred: $e";
         isLoading = false;
@@ -58,6 +66,7 @@ class DriveExplorerState extends State<DriveExplorer> {
   }
 
   void navigateToFolder(String folderId, String folderName) {
+    print("navigateToFolder: Navigating to folder $folderName with ID $folderId");
     setState(() {
       currentFolderId = folderId;
       currentFolderName = folderName;
@@ -65,30 +74,53 @@ class DriveExplorerState extends State<DriveExplorer> {
     fetchFolderContents(folderId);
   }
 
+  // Beautiful card layout for folder and file
   Widget buildFolderItem(dynamic item) {
-    if (item['mimeType'] == 'application/vnd.google-apps.folder') {
-      // Folder
-      return ListTile(
-        leading: const Icon(Icons.folder, color: Colors.blue),
-        title: Text(item['name']),
-        onTap: () => navigateToFolder(item['id'], item['name']),
-      );
-    } else {
-      // File
-      return Card(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: ListTile(
-          leading: const Icon(Icons.insert_drive_file, color: Colors.grey),
-          title: Text(item['name']),
-          subtitle: Text("Type: ${item['mimeType']}"),
-          onTap: () {
-            // Handle file click (e.g., show details or download)
-          },
-        ),
-      );
-    }
-  }
+    bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
 
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
+      child: InkWell(
+        onTap: () {
+          if (isFolder) {
+            navigateToFolder(item['id'], item['name']);
+          } else {
+            // Handle file click (e.g., show details or download)
+            print("File clicked: ${item['name']}");
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(
+                isFolder ? Icons.folder : Icons.insert_drive_file,
+                color: isFolder ? Colors.blue : Colors.grey,
+                size: 40,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  item['name'],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+// ================================================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,8 +130,11 @@ class DriveExplorerState extends State<DriveExplorer> {
             ? IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Handle navigation back to parent folder (optional)
-            // In this example, user navigates using folder tree.
+            setState(() {
+              currentFolderId = rootFolderId;
+              currentFolderName = "Root Folder";
+            });
+            fetchFolderContents(rootFolderId);
           },
         )
             : null,

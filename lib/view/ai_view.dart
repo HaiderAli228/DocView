@@ -79,7 +79,7 @@ class _AiViewState extends State<AiView> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultScreen(response: response),
+          builder: (context) => ResultScreenOfAI(response: response),
         ),
       );
     } catch (e) {

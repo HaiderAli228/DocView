@@ -2,16 +2,16 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:docsview/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class ResultScreen extends StatefulWidget {
+class ResultScreenOfAI extends StatefulWidget {
   final Map<String, dynamic> response;
 
-  const ResultScreen({super.key, required this.response});
+  const ResultScreenOfAI({super.key, required this.response});
 
   @override
-  _ResultScreenState createState() => _ResultScreenState();
+  _ResultScreenOfAIState createState() => _ResultScreenOfAIState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class _ResultScreenOfAIState extends State<ResultScreenOfAI> {
   bool showSummary = false;
   bool showOutlines = false;
   bool showQuestions = false;

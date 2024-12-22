@@ -1,6 +1,5 @@
 import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/view/SemesterDetailView/book_outlines.dart';
-
 import 'package:docsview/view/SemesterDetailView/final_past_paper.dart';
 import 'package:docsview/view/SemesterDetailView/imp_question.dart';
 import 'package:docsview/view/SemesterDetailView/lecture_notes.dart';
@@ -12,6 +11,7 @@ import 'package:docsview/view/intro_view.dart';
 import 'package:flutter/material.dart';
 import '../view/dept_detail_view.dart';
 import '../view/home_view.dart';
+import '../view/result_screen.dart';
 import '../view/semester_detail_view.dart';
 import '../view/splash_screen.dart';
 
@@ -61,6 +61,8 @@ class Routes {
 
       case RoutesName.semesterNotesDetailView:
         return _createRoute(const SemesterNotesDetail());
+ case RoutesName.resultScreen:
+        return _createRoute(const ResultScreen());
 
       case RoutesName.semesterOutlinesDetailView:
         return _createRoute(const SemesterBookOutlinesDetail(

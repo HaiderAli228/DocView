@@ -12,4 +12,5 @@ class RoutesName{
   static const String semesterFinalPaperDetailView = "semester_FinalPaper_detail_screen" ;
   static const String semesterImpQusDetailView = "semester_ImpQus_detail_screen" ;
   static const String semesterNotesDetailView = "semester_Notes_detail_screen" ;
+  static const String resultScreen = "result_screen" ;
 }
