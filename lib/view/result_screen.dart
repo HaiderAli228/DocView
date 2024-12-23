@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-c // Replace with your root folder ID
+// Replace with your root folder ID
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -21,11 +21,9 @@ class ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
-    print("initState: Starting to fetch folder contents");
     fetchFolderContents(currentFolderId);
   }
 
-  // Recursive function to fetch folder contents
   Future<void> fetchFolderContents(String folderId) async {
     setState(() {
       isLoading = true;
@@ -34,30 +32,21 @@ class ResultScreenState extends State<ResultScreen> {
 
     final String url =
         "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
-    print("fetchFolderContents: URL is $url");
-
     try {
       final response = await http.get(Uri.parse(url));
-      print("fetchFolderContents: Response status is ${response.statusCode}");
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print("fetchFolderContents: Response data is $data");
-
         setState(() {
           folderContents = data['files'] ?? [];
           isLoading = false;
         });
-        print("fetchFolderContents: Successfully fetched folder contents");
       } else {
-        print("fetchFolderContents: Error - ${response.statusCode} ${response.reasonPhrase}");
         setState(() {
           errorMessage = "Error: ${response.statusCode} ${response.reasonPhrase}";
           isLoading = false;
         });
       }
     } catch (e) {
-      print("fetchFolderContents: Exception caught - $e");
       setState(() {
         errorMessage = "An error occurred: $e";
         isLoading = false;
@@ -66,7 +55,6 @@ class ResultScreenState extends State<ResultScreen> {
   }
 
   void navigateToFolder(String folderId, String folderName) {
-    print("navigateToFolder: Navigating to folder $folderName with ID $folderId");
     setState(() {
       currentFolderId = folderId;
       currentFolderName = folderName;
@@ -74,45 +62,44 @@ class ResultScreenState extends State<ResultScreen> {
     fetchFolderContents(folderId);
   }
 
-  // Beautiful card layout for folder and file
   Widget buildFolderItem(dynamic item) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      elevation: 6,
+      color: Colors.white,
+      shadowColor: Colors.grey.withOpacity(0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      elevation: 5,
       child: InkWell(
         onTap: () {
           if (isFolder) {
             navigateToFolder(item['id'], item['name']);
           } else {
-            // Handle file click (e.g., show details or download)
             print("File clicked: ${item['name']}");
           }
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Row(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 isFolder ? Icons.folder : Icons.insert_drive_file,
                 color: isFolder ? Colors.blue : Colors.grey,
                 size: 40,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  item['name'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+              const SizedBox(height: 8),
+              Text(
+                item['name'],
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -120,7 +107,7 @@ class ResultScreenState extends State<ResultScreen> {
       ),
     );
   }
-// ================================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,7 +132,14 @@ class ResultScreenState extends State<ResultScreen> {
           ? Center(child: Text(errorMessage!))
           : folderContents.isEmpty
           ? const Center(child: Text("No files or folders found."))
-          : ListView.builder(
+          : GridView.builder(
+        padding: const EdgeInsets.all(8),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // Two cards per row
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 3 / 2, // Adjust card height-to-width ratio
+        ),
         itemCount: folderContents.length,
         itemBuilder: (context, index) {
           final item = folderContents[index];
