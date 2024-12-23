@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-// Replace with your root folder ID
+import 'package:shimmer/shimmer.dart';
+ // Replace with your root folder ID
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -12,8 +12,21 @@ class ResultScreen extends StatefulWidget {
 }
 
 class ResultScreenState extends State<ResultScreen> {
-  String currentFolderId = rootFolderId; // Start at the root folder
-  String currentFolderName = "Root Folder"; // Display folder name
+
+  static List<Map<String, String>> departments = [
+    {"name": "computer", "icon": "assets/images/computer.png"},
+    {"name": "physics", "icon": "assets/images/physics.png"},
+    {"name": "chemistry", "icon": "assets/images/chemistry.png"},
+    {"name": "botany", "icon": "assets/images/botany.png"},
+    {"name": "zoology", "icon": "assets/images/zoology.png"},
+    {"name": "math", "icon": "assets/images/math.png"},
+    {"name": "islamiyat", "icon": "assets/images/islam.png"},
+    {"name": "english", "icon": "assets/images/english.png"},
+    {"name": "economy", "icon": "assets/images/bba.png"},
+  ];
+
+  String currentFolderId = rootFolderId;
+  String currentFolderName = "Root Folder";
   List<dynamic> folderContents = [];
   bool isLoading = false;
   String? errorMessage;
@@ -62,7 +75,16 @@ class ResultScreenState extends State<ResultScreen> {
     fetchFolderContents(folderId);
   }
 
-  Widget buildFolderItem(dynamic item) {
+  // Function to get the department icon based on the folder name
+  String getDepartmentIcon(String folderName) {
+    final department = departments.firstWhere(
+          (department) => department['name'] == folderName,
+      orElse: () => {"icon": "assets/images/default.png"},
+    );
+    return department['icon'] ?? "assets/images/default.png"; // Default icon if not found
+  }
+
+  Widget buildFolderItem(dynamic item, int index) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
 
     return Card(
@@ -85,10 +107,11 @@ class ResultScreenState extends State<ResultScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                isFolder ? Icons.folder : Icons.insert_drive_file,
-                color: isFolder ? Colors.blue : Colors.grey,
-                size: 40,
+              Image.asset(
+                getDepartmentIcon(item['name']),
+                width: 50,
+                height: 50,
+                fit: BoxFit.contain,
               ),
               const SizedBox(height: 8),
               Text(
@@ -105,6 +128,52 @@ class ResultScreenState extends State<ResultScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildShimmerEffect(int count) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 3 / 2,
+      ),
+      itemCount: count,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Card(
+            elevation: 6,
+            color: Colors.white,
+            shadowColor: Colors.grey.withOpacity(0.4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 60,
+                    height: 16,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -127,7 +196,7 @@ class ResultScreenState extends State<ResultScreen> {
             : null,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? buildShimmerEffect(folderContents.isNotEmpty ? folderContents.length : 6)
           : errorMessage != null
           ? Center(child: Text(errorMessage!))
           : folderContents.isEmpty
@@ -135,15 +204,15 @@ class ResultScreenState extends State<ResultScreen> {
           : GridView.builder(
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Two cards per row
+          crossAxisCount: 2,
           crossAxisSpacing: 8,
           mainAxisSpacing: 8,
-          childAspectRatio: 3 / 2, // Adjust card height-to-width ratio
+          childAspectRatio: 3 / 2,
         ),
         itemCount: folderContents.length,
         itemBuilder: (context, index) {
           final item = folderContents[index];
-          return buildFolderItem(item);
+          return buildFolderItem(item, index);
         },
       ),
     );
