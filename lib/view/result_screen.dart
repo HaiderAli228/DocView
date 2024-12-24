@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
- Replace with your root folder ID
+// Replace with your root folder ID
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -13,7 +13,6 @@ class ResultScreen extends StatefulWidget {
 }
 
 class ResultScreenState extends State<ResultScreen> {
-
   static List<Map<String, String>> departments = [
     {"name": "Computer", "icon": "assets/images/computer.png"},
     {"name": "Physics", "icon": "assets/images/physics.png"},
@@ -31,6 +30,7 @@ class ResultScreenState extends State<ResultScreen> {
   List<dynamic> folderContents = [];
   bool isLoading = false;
   String? errorMessage;
+  final List<Map<String, String>> navigationStack = [];
 
   @override
   void initState() {
@@ -52,8 +52,7 @@ class ResultScreenState extends State<ResultScreen> {
         final data = json.decode(response.body);
         List<dynamic> files = data['files'] ?? [];
 
-        // Sort the files and folders by name in ascending order
-        files.sort((a, b) => a['name'].toLowerCase().compareTo(b['name'].toLowerCase()));
+        files.sort((a, b) => a['name']?.toLowerCase()?.compareTo(b['name']?.toLowerCase() ?? '') ?? 0);
 
         setState(() {
           folderContents = files;
@@ -74,6 +73,11 @@ class ResultScreenState extends State<ResultScreen> {
   }
 
   void navigateToFolder(String folderId, String folderName) {
+    navigationStack.add({
+      "id": currentFolderId,
+      "name": currentFolderName,
+    });
+
     setState(() {
       currentFolderId = folderId;
       currentFolderName = folderName;
@@ -81,16 +85,26 @@ class ResultScreenState extends State<ResultScreen> {
     fetchFolderContents(folderId);
   }
 
-  // Function to get the department icon based on the folder name
+  void navigateBack() {
+    if (navigationStack.isNotEmpty) {
+      final previousFolder = navigationStack.removeLast();
+      setState(() {
+        currentFolderId = previousFolder["id"]!;
+        currentFolderName = previousFolder["name"]!;
+      });
+      fetchFolderContents(currentFolderId);
+    }
+  }
+
   String getDepartmentIcon(String folderName) {
     final department = departments.firstWhere(
           (department) => department['name'] == folderName,
-      orElse: () => {"icon": "assets/images/default.png"},
+      orElse: () => {"icon": "assets/images/folder.png"},
     );
-    return department['icon'] ?? "assets/images/default.png"; // Default icon if not found
+    return department['icon'] ?? "assets/images/folder.png";
   }
 
-  Widget buildFolderItem(dynamic item, int index) {
+  Widget buildFolderItem(dynamic item) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
 
     return Card(
@@ -103,7 +117,7 @@ class ResultScreenState extends State<ResultScreen> {
       child: InkWell(
         onTap: () {
           if (isFolder) {
-            navigateToFolder(item['id'], item['name']);
+            navigateToFolder(item['id'] ?? '', item['name'] ?? 'Unknown Folder');
           } else {
             print("File clicked: ${item['name']}");
           }
@@ -114,14 +128,14 @@ class ResultScreenState extends State<ResultScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                getDepartmentIcon(item['name']),
+                getDepartmentIcon(item['name'] ?? 'Unknown'),
                 width: 50,
                 height: 50,
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 8),
               Text(
-                item['name'],
+                item['name'] ?? 'Unknown',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -188,16 +202,10 @@ class ResultScreenState extends State<ResultScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(currentFolderName),
-        leading: currentFolderId != rootFolderId
+        leading: navigationStack.isNotEmpty
             ? IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            setState(() {
-              currentFolderId = rootFolderId;
-              currentFolderName = "Root Folder";
-            });
-            fetchFolderContents(rootFolderId);
-          },
+          onPressed: navigateBack,
         )
             : null,
       ),
@@ -218,7 +226,7 @@ class ResultScreenState extends State<ResultScreen> {
         itemCount: folderContents.length,
         itemBuilder: (context, index) {
           final item = folderContents[index];
-          return buildFolderItem(item, index);
+          return buildFolderItem(item);
         },
       ),
     );
