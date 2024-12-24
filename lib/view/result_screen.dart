@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
- // Replace with your root folder ID
+
+ Replace with your root folder ID
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -14,15 +15,15 @@ class ResultScreen extends StatefulWidget {
 class ResultScreenState extends State<ResultScreen> {
 
   static List<Map<String, String>> departments = [
-    {"name": "computer", "icon": "assets/images/computer.png"},
-    {"name": "physics", "icon": "assets/images/physics.png"},
-    {"name": "chemistry", "icon": "assets/images/chemistry.png"},
-    {"name": "botany", "icon": "assets/images/botany.png"},
-    {"name": "zoology", "icon": "assets/images/zoology.png"},
-    {"name": "math", "icon": "assets/images/math.png"},
-    {"name": "islamiyat", "icon": "assets/images/islam.png"},
-    {"name": "english", "icon": "assets/images/english.png"},
-    {"name": "economy", "icon": "assets/images/bba.png"},
+    {"name": "Computer", "icon": "assets/images/computer.png"},
+    {"name": "Physics", "icon": "assets/images/physics.png"},
+    {"name": "Chemistry", "icon": "assets/images/chemistry.png"},
+    {"name": "Botany", "icon": "assets/images/botany.png"},
+    {"name": "Zoology", "icon": "assets/images/zoology.png"},
+    {"name": "Math", "icon": "assets/images/math.png"},
+    {"name": "Islamiyat", "icon": "assets/images/islam.png"},
+    {"name": "English", "icon": "assets/images/english.png"},
+    {"name": "Economy", "icon": "assets/images/bba.png"},
   ];
 
   String currentFolderId = rootFolderId;
@@ -49,8 +50,13 @@ class ResultScreenState extends State<ResultScreen> {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        List<dynamic> files = data['files'] ?? [];
+
+        // Sort the files and folders by name in ascending order
+        files.sort((a, b) => a['name'].toLowerCase().compareTo(b['name'].toLowerCase()));
+
         setState(() {
-          folderContents = data['files'] ?? [];
+          folderContents = files;
           isLoading = false;
         });
       } else {
