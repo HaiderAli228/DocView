@@ -1,8 +1,17 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:docsview/routes/routes_name.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
+import 'new_screen.dart';
+
+// Fetch API key and root folder ID from environment variables
+final String apiKey = dotenv.env['API_KEY'] ?? '';
+final String rootFolderId = dotenv.env['ROOT_FOLDER_ID'] ?? '';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -18,22 +27,181 @@ class HomeViewState extends State<HomeView> {
     'assets/images/3.jpg',
   ];
 
-   static List<Map<String, String>> departments = [
+  String currentFolderId = rootFolderId;
+  String currentFolderName = "Root Folder";
+  List<dynamic> folderContents = [];
+  bool isLoading = false;
+  String? errorMessage;
+  final List<Map<String, String>> navigationStack = [];
+
+  // Define your department icons
+  static List<Map<String, String>> departments = [
     {"name": "Computer", "icon": "assets/images/computer.png"},
     {"name": "Physics", "icon": "assets/images/physics.png"},
     {"name": "Chemistry", "icon": "assets/images/chemistry.png"},
     {"name": "Botany", "icon": "assets/images/botany.png"},
     {"name": "Zoology", "icon": "assets/images/zoology.png"},
-    {"name": "Mathematics", "icon": "assets/images/math.png"},
-    {"name": "Islamist", "icon": "assets/images/islam.png"},
+    {"name": "Math", "icon": "assets/images/math.png"},
+    {"name": "Islamiyat", "icon": "assets/images/islam.png"},
     {"name": "English", "icon": "assets/images/english.png"},
-    {"name": "Economics", "icon": "assets/images/bba.png"},
+    {"name": "Economy", "icon": "assets/images/bba.png"},
   ];
 
   @override
+  void initState() {
+    super.initState();
+    fetchFolderContents(currentFolderId);
+  }
+
+  Future<void> fetchFolderContents(String folderId) async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    final String url =
+        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        List<dynamic> files = data['files'] ?? [];
+
+        files.sort((a, b) => a['name']?.toLowerCase()?.compareTo(b['name']?.toLowerCase() ?? '') ?? 0);
+
+        setState(() {
+          folderContents = files;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = "Error: ${response.statusCode} ${response.reasonPhrase}";
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = "An error occurred: $e";
+        isLoading = false;
+      });
+    }
+  }
+
+  void navigateToFolder(String folderId, String folderName) {
+    navigationStack.add({
+      "id": currentFolderId,
+      "name": currentFolderName,
+    });
+
+    setState(() {
+      currentFolderId = folderId;
+      currentFolderName = folderName;
+    });
+    fetchFolderContents(folderId);
+  }
+
+  void navigateBack() {
+    if (navigationStack.isNotEmpty) {
+      final previousFolder = navigationStack.removeLast();
+      setState(() {
+        currentFolderId = previousFolder["id"]!;
+        currentFolderName = previousFolder["name"]!;
+      });
+      fetchFolderContents(currentFolderId);
+    }
+  }
+
+  Widget buildFolderItem(dynamic item) {
+    bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
+
+    // Check if the department exists for the folder name
+    String departmentIcon = 'assets/images/defaultIcon.png'; // Default icon
+    for (var department in departments) {
+      if (item['name'] == department['name']) {
+        departmentIcon = department['icon'] ?? departmentIcon;
+        break;
+      }
+    }
+
+    return Card(
+      elevation: 6,
+      color: Colors.white,
+      shadowColor: Colors.grey.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: InkWell(
+        onTap: () {
+          if (isFolder) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FolderContentsView(
+                  folderId: item['id'] ?? '',
+                  folderName: item['name'] ?? 'Unknown Folder',
+                ),
+              ),
+            );
+          } else {
+            print("File clicked: ${item['name']}");
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                departmentIcon,
+                width: 50,
+                height: 50,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                item['name'] ?? 'Unknown',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildLoadingIndicator() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, // Two blocks in one row
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: 6, // Adjust count for shimmer placeholders
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 100, // Adjust height as needed
+            width: double.infinity,
+            color: Colors.white, // Placeholder color
+            margin: const EdgeInsets.all(4.0), // Optional margin
+          ),
+        );
+      },
+    );
+  }
+  @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final int crossAxisCount = screenWidth < 600 ? 2 : 4;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -103,7 +271,7 @@ class HomeViewState extends State<HomeView> {
                                   width: 50,
                                   decoration: BoxDecoration(
                                     color:
-                                        AppColors.themeColor.withOpacity(0.1),
+                                    AppColors.themeColor.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   padding: const EdgeInsets.all(10),
@@ -162,111 +330,47 @@ class HomeViewState extends State<HomeView> {
                         return Builder(
                           builder: (BuildContext context) {
                             return Container(
-                              width: MediaQuery.of(context).size.width,
+                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 5.0,
-                                    offset: const Offset(0, 3),
+                                  image: DecorationImage(
+                                    image: AssetImage(imagePath),
+                                    fit: BoxFit.cover,
                                   ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Image.asset(
-                                  imagePath,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                                  borderRadius: BorderRadius.circular(15)),
                             );
                           },
                         );
                       }).toList(),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    GridView.builder(
+                    const SizedBox(height: 20),
+                    isLoading
+                        ? buildLoadingIndicator() // Shimmer effect instead of circular progress indicator
+                        : folderContents.isNotEmpty
+                        ? GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 20,
-                        childAspectRatio: 1.1, // Adjust height-to-width ratio
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
                       ),
-                      itemCount: departments.length,
+                      itemCount: folderContents.length,
                       itemBuilder: (context, index) {
-                        final department = departments[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              RoutesName.deptDetailView,
-                              arguments: {
-                                'name': department['name']!,
-                                'icon': department['icon']!,
-                              },
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.4),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  department['icon']!,
-                                  height: 50,
-                                  width: 50,
-                                  fit: BoxFit.contain,
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  department['name']!,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                        return buildFolderItem(folderContents[index]);
                       },
-                    ),
-                    const SizedBox(
-                      height: 20,
+                    )
+                        : Center(
+                      child: Text(
+                        errorMessage ?? 'No files or folders found',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.themeColor,
-          onPressed: () {
-            Navigator.pushNamed(context, RoutesName.aiScreenView);
-          },
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 40,
           ),
         ),
       ),

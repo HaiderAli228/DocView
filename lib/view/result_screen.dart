@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
-// Replace with your root folder ID
+// Fetch API key and root folder ID from environment variables
+final String apiKey = dotenv.env['API_KEY'] ?? '';
+final String rootFolderId = dotenv.env['ROOT_FOLDER_ID'] ?? '';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -95,13 +98,13 @@ class ResultScreenState extends State<ResultScreen> {
       fetchFolderContents(currentFolderId);
     }
   }
-
   String getDepartmentIcon(String folderName) {
+    // Check if folder name matches any department
     final department = departments.firstWhere(
-          (department) => department['name'] == folderName,
-      orElse: () => {"icon": "assets/images/folder.png"},
+          (department) => folderName.toLowerCase().contains(department['name']!.toLowerCase()),
+      orElse: () => {"icon": "assets/images/defaultIcon.png"},
     );
-    return department['icon'] ?? "assets/images/folder.png";
+    return department['icon'] ?? "assets/images/defaultIcon.png";
   }
 
   Widget buildFolderItem(dynamic item) {
