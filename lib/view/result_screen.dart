@@ -1,44 +1,35 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:shimmer/shimmer.dart';
+import 'dart:async';
 
-// Fetch API key and root folder ID from environment variables
-final String apiKey = dotenv.env['API_KEY'] ?? '';
-final String rootFolderId = dotenv.env['ROOT_FOLDER_ID'] ?? '';
+import 'package:docsview/utils/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:lottie/lottie.dart';
 
 class ResultScreen extends StatefulWidget {
-  const ResultScreen({super.key});
+  final String folderId;
+  final String folderName;
+
+  const ResultScreen({
+    super.key,
+    required this.folderId,
+    required this.folderName,
+  });
 
   @override
   ResultScreenState createState() => ResultScreenState();
 }
 
 class ResultScreenState extends State<ResultScreen> {
-  static List<Map<String, String>> departments = [
-    {"name": "Computer", "icon": "assets/images/computer.png"},
-    {"name": "Physics", "icon": "assets/images/physics.png"},
-    {"name": "Chemistry", "icon": "assets/images/chemistry.png"},
-    {"name": "Botany", "icon": "assets/images/botany.png"},
-    {"name": "Zoology", "icon": "assets/images/zoology.png"},
-    {"name": "Math", "icon": "assets/images/math.png"},
-    {"name": "Islamiyat", "icon": "assets/images/islam.png"},
-    {"name": "English", "icon": "assets/images/english.png"},
-    {"name": "Economy", "icon": "assets/images/bba.png"},
-  ];
-
-  String currentFolderId = rootFolderId;
-  String currentFolderName = "Root Folder";
   List<dynamic> folderContents = [];
   bool isLoading = false;
   String? errorMessage;
-  final List<Map<String, String>> navigationStack = [];
 
   @override
   void initState() {
     super.initState();
-    fetchFolderContents(currentFolderId);
+    fetchFolderContents(widget.folderId);
   }
 
   Future<void> fetchFolderContents(String folderId) async {
@@ -47,15 +38,22 @@ class ResultScreenState extends State<ResultScreen> {
       errorMessage = null;
     });
 
+    final String apiKey = dotenv.env['API_KEY'] ?? '';
     final String url =
         "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10)); // Timeout after 10 seconds
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         List<dynamic> files = data['files'] ?? [];
 
-        files.sort((a, b) => a['name']?.toLowerCase()?.compareTo(b['name']?.toLowerCase() ?? '') ?? 0);
+        files.sort((a, b) =>
+        a['name']?.toLowerCase()?.compareTo(b['name']?.toLowerCase() ?? '') ??
+            0);
 
         setState(() {
           folderContents = files;
@@ -63,48 +61,46 @@ class ResultScreenState extends State<ResultScreen> {
         });
       } else {
         setState(() {
-          errorMessage = "Error: ${response.statusCode} ${response.reasonPhrase}";
+          errorMessage = "Server Error: ${response.statusCode}";
           isLoading = false;
         });
       }
+    } on http.ClientException {
+      setState(() {
+        errorMessage = "Unable to connect to the server. Check your connection.";
+        isLoading = false;
+      });
+    } on TimeoutException {
+      setState(() {
+        errorMessage = "Request timed out. Please try again.";
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
-        errorMessage = "An error occurred: $e";
+        errorMessage = "An unexpected error occurred.";
         isLoading = false;
       });
     }
   }
 
   void navigateToFolder(String folderId, String folderName) {
-    navigationStack.add({
-      "id": currentFolderId,
-      "name": currentFolderName,
-    });
-
-    setState(() {
-      currentFolderId = folderId;
-      currentFolderName = folderName;
-    });
-    fetchFolderContents(folderId);
-  }
-
-  void navigateBack() {
-    if (navigationStack.isNotEmpty) {
-      final previousFolder = navigationStack.removeLast();
-      setState(() {
-        currentFolderId = previousFolder["id"]!;
-        currentFolderName = previousFolder["name"]!;
-      });
-      fetchFolderContents(currentFolderId);
-    }
-  }
-  String getDepartmentIcon(String folderName) {
-    // Check if folder name matches any department
-    final department = departments.firstWhere(
-          (department) => folderName.toLowerCase().contains(department['name']!.toLowerCase()),
-      orElse: () => {"icon": "assets/images/defaultIcon.png"},
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultScreen(
+          folderId: folderId,
+          folderName: folderName,
+        ),
+      ),
     );
-    return department['icon'] ?? "assets/images/defaultIcon.png";
+  }
+
+  String getDepartmentIcon(String name) {
+    if (name.toLowerCase().contains('folder')) {
+      return 'assets/images/folder.png'; // Replace with your folder icon asset
+    } else {
+      return 'assets/images/file.png'; // Replace with your file icon asset
+    }
   }
 
   Widget buildFolderItem(dynamic item) {
@@ -120,7 +116,8 @@ class ResultScreenState extends State<ResultScreen> {
       child: InkWell(
         onTap: () {
           if (isFolder) {
-            navigateToFolder(item['id'] ?? '', item['name'] ?? 'Unknown Folder');
+            navigateToFolder(
+                item['id'] ?? '', item['name'] ?? 'Unknown Folder');
           } else {
             print("File clicked: ${item['name']}");
           }
@@ -154,83 +151,57 @@ class ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget buildShimmerEffect(int count) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 3 / 2,
-      ),
-      itemCount: count,
-      itemBuilder: (context, index) {
-        return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Card(
-            elevation: 6,
-            color: Colors.white,
-            shadowColor: Colors.grey.withOpacity(0.4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 60,
-                    height: 16,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(currentFolderName),
-        leading: navigationStack.isNotEmpty
-            ? IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: navigateBack,
-        )
-            : null,
+        backgroundColor: AppColors.themeColor,
+        foregroundColor: Colors.white,
+        title: Text(
+          widget.folderName,
+          style: const TextStyle(fontFamily: "Poppins"),
+        ),
       ),
       body: isLoading
-          ? buildShimmerEffect(folderContents.isNotEmpty ? folderContents.length : 6)
-          : errorMessage != null
-          ? Center(child: Text(errorMessage!))
-          : folderContents.isEmpty
-          ? const Center(child: Text("No files or folders found."))
-          : GridView.builder(
-        padding: const EdgeInsets.all(8),
+          ? const Center(child: CircularProgressIndicator())
+          : folderContents.isNotEmpty
+          ? GridView.builder(
+        padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 3 / 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
         ),
         itemCount: folderContents.length,
         itemBuilder: (context, index) {
-          final item = folderContents[index];
-          return buildFolderItem(item);
+          return buildFolderItem(folderContents[index]);
         },
+      )
+          : Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (errorMessage == null)
+              Lottie.asset(
+                'assets/images/noData.json',
+                height: 300,
+                fit: BoxFit.contain,
+              )
+            else
+              Lottie.asset(
+                'assets/images/internetError.json',
+                height: 300,
+                fit: BoxFit.contain,
+              ),
+            const SizedBox(height: 16),
+            Text(
+              errorMessage ?? 'No files or folders found.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
       ),
     );
   }

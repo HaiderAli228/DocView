@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -7,7 +9,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-import 'new_screen.dart';
+import 'result_screen.dart';
 
 // Fetch API key and root folder ID from environment variables
 final String apiKey = dotenv.env['API_KEY'] ?? '';
@@ -61,8 +63,12 @@ class HomeViewState extends State<HomeView> {
 
     final String url =
         "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10)); // Timeout after 10 seconds
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         List<dynamic> files = data['files'] ?? [];
@@ -75,13 +81,28 @@ class HomeViewState extends State<HomeView> {
         });
       } else {
         setState(() {
-          errorMessage = "Error: ${response.statusCode} ${response.reasonPhrase}";
+          errorMessage = "Failed to fetch data. Try again later.";
           isLoading = false;
         });
       }
-    } catch (e) {
+    } on http.ClientException catch (_) {
       setState(() {
-        errorMessage = "An error occurred: $e";
+        errorMessage = "Failed to connect. Check your internet connection.";
+        isLoading = false;
+      });
+    } on TimeoutException {
+      setState(() {
+        errorMessage = "Request timed out. Please try again.";
+        isLoading = false;
+      });
+    } on FormatException {
+      setState(() {
+        errorMessage = "Invalid response format. Please try again later.";
+        isLoading = false;
+      });
+    } catch (_) {
+      setState(() {
+        errorMessage = "An unexpected error occurred.";
         isLoading = false;
       });
     }
@@ -122,9 +143,8 @@ class HomeViewState extends State<HomeView> {
         break;
       }
     }
-
     return Card(
-      elevation: 6,
+      elevation: 8,
       color: Colors.white,
       shadowColor: Colors.grey.withOpacity(0.4),
       shape: RoundedRectangleBorder(
@@ -136,7 +156,7 @@ class HomeViewState extends State<HomeView> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => FolderContentsView(
+                builder: (context) => ResultScreen(
                   folderId: item['id'] ?? '',
                   folderName: item['name'] ?? 'Unknown Folder',
                 ),
