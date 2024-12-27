@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shimmer/shimmer.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
@@ -67,7 +68,7 @@ class HomeViewState extends State<HomeView> {
     try {
       final response = await http
           .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10)); // Timeout after 10 seconds
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -322,7 +323,7 @@ class HomeViewState extends State<HomeView> {
                     ),
                     RichText(
                       text: const TextSpan(
-                        style: TextStyle(fontSize: 25),
+                        style: TextStyle(fontSize: 20),
                         children: [
                           TextSpan(
                               text: "Code your path to success with ",
@@ -381,10 +382,17 @@ class HomeViewState extends State<HomeView> {
                       },
                     )
                         : Center(
-                      child: Text(
-                        errorMessage ?? 'No files or folders found',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            errorMessage ?? 'No files or folders found',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          Lottie.asset("assets/images/internetError.json"),
+
+                        ],
                       ),
                     ),
                   ],

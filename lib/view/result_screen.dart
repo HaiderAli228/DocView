@@ -1,11 +1,12 @@
 import 'dart:async';
-
 import 'package:docsview/utils/app_colors.dart';
+import 'package:docsview/view/pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:lottie/lottie.dart';
+
 
 class ResultScreen extends StatefulWidget {
   final String folderId;
@@ -40,7 +41,7 @@ class ResultScreenState extends State<ResultScreen> {
 
     final String apiKey = dotenv.env['API_KEY'] ?? '';
     final String url =
-        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType,webContentLink)";
 
     try {
       final response = await http
@@ -52,8 +53,7 @@ class ResultScreenState extends State<ResultScreen> {
         List<dynamic> files = data['files'] ?? [];
 
         files.sort((a, b) =>
-        a['name']?.toLowerCase()?.compareTo(b['name']?.toLowerCase() ?? '') ??
-            0);
+        a['name']?.toLowerCase()?.compareTo(b['name']?.toLowerCase() ?? '') ?? 0);
 
         setState(() {
           folderContents = files;
@@ -95,11 +95,21 @@ class ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  String getDepartmentIcon(String name) {
-    if (name.toLowerCase().contains('folder')) {
-      return 'assets/images/folder.png'; // Replace with your folder icon asset
+  void openFile(String fileUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PDFViewerScreen(pdfUrl: fileUrl),
+      ),
+    );
+  }
+
+
+  String getDepartmentIcon(String mimeType) {
+    if (mimeType == 'application/vnd.google-apps.folder') {
+      return 'assets/images/defaultIcon.png'; // Folder icon
     } else {
-      return 'assets/images/file.png'; // Replace with your file icon asset
+      return 'assets/images/file.png'; // File icon
     }
   }
 
@@ -116,10 +126,9 @@ class ResultScreenState extends State<ResultScreen> {
       child: InkWell(
         onTap: () {
           if (isFolder) {
-            navigateToFolder(
-                item['id'] ?? '', item['name'] ?? 'Unknown Folder');
+            navigateToFolder(item['id'] ?? '', item['name'] ?? 'Unknown Folder');
           } else {
-            print("File clicked: ${item['name']}");
+            openFile(item['webContentLink'] ?? ''); // Pass the webContentLink for files
           }
         },
         child: Padding(
@@ -128,7 +137,7 @@ class ResultScreenState extends State<ResultScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                getDepartmentIcon(item['name'] ?? 'Unknown'),
+                getDepartmentIcon(item['mimeType'] ?? ''),
                 width: 50,
                 height: 50,
                 fit: BoxFit.contain,
@@ -164,7 +173,7 @@ class ResultScreenState extends State<ResultScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppColors.themeColor,))
           : folderContents.isNotEmpty
           ? GridView.builder(
         padding: const EdgeInsets.all(16),
