@@ -67,15 +67,15 @@ class ResultScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Lottie.asset(
-                    'assets/images/noData.json',
+                    'assets/images/progress.json',
                     height: 300,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'No files or folders found.',
+                  const Text(
+                    "Working on it, available soon",
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 18),
+                    style:  TextStyle(fontSize: 18),
                   ),
                 ],
               ),
