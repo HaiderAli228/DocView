@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: "Poppins",
           primaryColor: AppColors.themeColor, primarySwatch: Colors.blue),
-      initialRoute: RoutesName.splashScreenView,
+      initialRoute: RoutesName.homeScreenView,
       onGenerateRoute: Routes.generatedRoutes,
     );
   }

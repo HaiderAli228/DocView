@@ -2,16 +2,12 @@ import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/view/ai_view.dart';
 import 'package:flutter/material.dart';
 import '../view/home_view.dart';
-import '../view/splash_screen.dart';
 
 class Routes {
   static Route<dynamic> generatedRoutes(RouteSettings settings) {
     switch (settings.name) {
       case RoutesName.homeScreenView:
         return _createRoute(const HomeView());
-
-      case RoutesName.splashScreenView:
-        return _createRoute(const SplashScreen());
 
       case RoutesName.aiScreenView:
         return _createRoute(const AiView());

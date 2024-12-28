@@ -110,3 +110,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_native_splash:
+  color: "#ffffff" # Background color
+  image: assets/images/icon.png # Path to your app icon (ensure it's added in your assets folder)
+  android: true # Apply splash screen for Android
+  ios: true # Apply splash screen for iOS
