@@ -7,7 +7,7 @@ class Routes {
   static Route<dynamic> generatedRoutes(RouteSettings settings) {
     switch (settings.name) {
       case RoutesName.homeScreenView:
-        return _createRoute(const HomeView());
+        return _createRoute( const HomeView());
 
       case RoutesName.aiScreenView:
         return _createRoute(const AiView());
