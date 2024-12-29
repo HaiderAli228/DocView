@@ -13,10 +13,10 @@ class PDFViewerScreen extends StatefulWidget {
   const PDFViewerScreen({super.key, required this.pdfUrl});
 
   @override
-  _PDFViewerScreenState createState() => _PDFViewerScreenState();
+  PDFViewerScreenState createState() => PDFViewerScreenState();
 }
 
-class _PDFViewerScreenState extends State<PDFViewerScreen> {
+class PDFViewerScreenState extends State<PDFViewerScreen> {
   String? localPath;
   bool isLoading = true;
   String? errorMessage;

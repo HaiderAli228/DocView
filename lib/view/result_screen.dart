@@ -3,7 +3,7 @@ import 'package:docsview/view/pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
-
+import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -20,7 +20,8 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Fetch the folder contents through the provider
     Future.delayed(Duration.zero, () {
-      Provider.of<FolderProvider>(context, listen: false).fetchFolderContents(folderId);
+      Provider.of<FolderProvider>(context, listen: false)
+          .fetchFolderContents(folderId);
     });
 
     return Scaffold(
@@ -36,7 +37,9 @@ class ResultScreen extends StatelessWidget {
       body: Consumer<FolderProvider>(
         builder: (context, folderProvider, child) {
           if (folderProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.themeColor));
+            return Padding(
+                padding: const EdgeInsets.all(20),
+                child: ShimmerEffect.shimmerEffect());
           }
 
           if (folderProvider.errorMessage != null) {
@@ -74,7 +77,7 @@ class ResultScreen extends StatelessWidget {
                   const Text(
                     "Working on it, available soon",
                     textAlign: TextAlign.center,
-                    style:  TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18),
                   ),
                 ],
               ),
@@ -100,7 +103,8 @@ class ResultScreen extends StatelessWidget {
                 ),
                 itemCount: folderProvider.folderContents.length,
                 itemBuilder: (context, index) {
-                  return buildFolderItem(folderProvider.folderContents[index], context);
+                  return buildFolderItem(
+                      folderProvider.folderContents[index], context);
                 },
               );
             },
@@ -136,7 +140,8 @@ class ResultScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PDFViewerScreen(pdfUrl: item['webContentLink'] ?? ''),
+                builder: (context) =>
+                    PDFViewerScreen(pdfUrl: item['webContentLink'] ?? ''),
               ),
             );
           }

@@ -1,11 +1,9 @@
-// lib/views/home_view.dart
-
+import 'package:docsview/utils/shimmer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
-import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
 import '../routes/routes_name.dart';
 
@@ -58,7 +56,7 @@ class HomeView extends StatelessWidget {
                                     width: 50,
                                     decoration: BoxDecoration(
                                       color:
-                                      AppColors.themeColor.withOpacity(0.1),
+                                          AppColors.themeColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     padding: const EdgeInsets.all(10),
@@ -75,7 +73,7 @@ class HomeView extends StatelessWidget {
                                     width: 50,
                                     decoration: BoxDecoration(
                                       color:
-                                      AppColors.themeColor.withOpacity(0.1),
+                                          AppColors.themeColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     padding: const EdgeInsets.all(8),
@@ -93,7 +91,7 @@ class HomeView extends StatelessWidget {
                               children: [
                                 TextSpan(
                                     text:
-                                    "Explore, learn, and expand your mind with the power of ",
+                                        "Explore, learn, and expand your mind with the power of ",
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontFamily: "Poppins")),
@@ -108,50 +106,52 @@ class HomeView extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           viewModel.isLoading
-                              ? ShimmerWidget()  // Use ShimmerWidget here
+                              ? ShimmerEffect.shimmerEffect()
                               : viewModel.folderContents.isNotEmpty
-                              ? LayoutBuilder(
-                            builder: (context, constraints) {
-                              int crossAxisCount =
-                              constraints.maxWidth > 600
-                                  ? 3
-                                  : 2; // 3 columns for wide screens
-                              return GridView.builder(
-                                shrinkWrap: true,
-                                physics:
-                                const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: crossAxisCount,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                ),
-                                itemCount: viewModel.folderContents.length,
-                                itemBuilder: (context, index) {
-                                  return buildFolderItem(
-                                      viewModel.folderContents[index],
-                                      context);
-                                },
-                              );
-                            },
-                          )
-                              : Center(
-                            child: Column(
-                              mainAxisAlignment:
-                              MainAxisAlignment.center,
-                              children: [
-                                Lottie.asset(
-                                    "assets/images/internetError.json"),
-                                Text(
-                                  viewModel.errorMessage ??
-                                      'No files or folders found',
-                                  textAlign: TextAlign.center,
-                                  style:
-                                  const TextStyle(fontSize: 18),
-                                ),
-                              ],
-                            ),
-                          ),
+                                  ? LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        int crossAxisCount = constraints
+                                                    .maxWidth >
+                                                600
+                                            ? 3
+                                            : 2; // 3 columns for wide screens
+                                        return GridView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: crossAxisCount,
+                                            crossAxisSpacing: 8,
+                                            mainAxisSpacing: 8,
+                                          ),
+                                          itemCount:
+                                              viewModel.folderContents.length,
+                                          itemBuilder: (context, index) {
+                                            return buildFolderItem(
+                                                viewModel.folderContents[index],
+                                                context);
+                                          },
+                                        );
+                                      },
+                                    )
+                                  : Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Lottie.asset(
+                                              "assets/images/internetError.json"),
+                                          Text(
+                                            viewModel.errorMessage ??
+                                                'No files or folders found',
+                                            textAlign: TextAlign.center,
+                                            style:
+                                                const TextStyle(fontSize: 18),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                           const SizedBox(height: 30),
                         ],
                       ),
