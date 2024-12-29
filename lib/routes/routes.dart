@@ -1,40 +1,52 @@
 import 'package:docsview/routes/routes_name.dart';
-import 'package:docsview/view/ai_view.dart';
 import 'package:flutter/material.dart';
 import '../view/home_view.dart';
+import '../view/result_screen.dart';
 
 class Routes {
+  /// Generates routes based on the route name and arguments
   static Route<dynamic> generatedRoutes(RouteSettings settings) {
     switch (settings.name) {
       case RoutesName.homeScreenView:
-        return _createRoute( const HomeView());
+        return _createRoute(const HomeView());
 
-      case RoutesName.aiScreenView:
-        return _createRoute(const AiView());
+      case RoutesName.resultView:
+        final args = settings.arguments as Map<String, dynamic>?;
+
+        if (args != null &&
+            args.containsKey('folderId') &&
+            args.containsKey('folderName')) {
+          return _createRoute(ResultScreen(
+            folderId: args['folderId'],
+            folderName: args['folderName'],
+          ));
+        } else {
+          return _errorRoute("Invalid or missing arguments for Result Screen");
+        }
 
       default:
-        return _errorRoute("Route Not Found");
+        return _errorRoute("No Route Defined for '${settings.name}'");
     }
   }
 
-  // Helper function to create a smooth animated route
+  /// Creates a custom route with smooth animations
   static PageRouteBuilder _createRoute(Widget page) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const curve = Curves.easeInOut; // Smooth curve for both entry and exit
+        const curve = Curves.easeInOut;
 
-        var slideAnimation = Tween<Offset>(
-          begin: const Offset(0.0, 1.0), // Slide from bottom to top
+        final slideAnimation = Tween<Offset>(
+          begin: const Offset(0.0, 1.0),
           end: Offset.zero,
         ).animate(CurvedAnimation(
           parent: animation,
           curve: curve,
         ));
 
-        var fadeAnimation = Tween<double>(
-          begin: 0.0, // Fade from transparent
-          end: 1.0, // To fully visible
+        final fadeAnimation = Tween<double>(
+          begin: 0.0,
+          end: 1.0,
         ).animate(CurvedAnimation(
           parent: animation,
           curve: curve,
@@ -48,17 +60,26 @@ class Routes {
           ),
         );
       },
-      transitionDuration: const Duration(milliseconds: 500), // Smooth speed
-      reverseTransitionDuration:
-          const Duration(milliseconds: 500), // Smooth for pop too
+      transitionDuration: const Duration(milliseconds: 500),
+      reverseTransitionDuration: const Duration(milliseconds: 500),
     );
   }
 
-  // Helper function to handle errors
+  /// Handles error routes with a customizable message
   static Route<dynamic> _errorRoute(String message) {
     return MaterialPageRoute(
       builder: (context) => Scaffold(
-        body: Center(child: Text(message)),
+        body: Center(
+          child: Text(
+            message,
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }

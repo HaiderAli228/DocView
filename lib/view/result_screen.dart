@@ -6,7 +6,6 @@ import 'package:lottie/lottie.dart';
 
 import '../view-model/provider.dart';
 
-
 class ResultScreen extends StatelessWidget {
   final String folderId;
   final String folderName;
@@ -82,16 +81,28 @@ class ResultScreen extends StatelessWidget {
             );
           }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
-            itemCount: folderProvider.folderContents.length,
-            itemBuilder: (context, index) {
-              return buildFolderItem(folderProvider.folderContents[index], context);
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // Decide on the number of columns based on screen width
+              int crossAxisCount = 2;
+              if (constraints.maxWidth > 600) {
+                crossAxisCount = 3; // Use 3 columns for larger screens
+              } else if (constraints.maxWidth > 1000) {
+                crossAxisCount = 4; // Use 4 columns for extra large screens
+              }
+
+              return GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: folderProvider.folderContents.length,
+                itemBuilder: (context, index) {
+                  return buildFolderItem(folderProvider.folderContents[index], context);
+                },
+              );
             },
           );
         },

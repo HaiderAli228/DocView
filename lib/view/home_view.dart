@@ -1,12 +1,13 @@
+// lib/views/home_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
-
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
+import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
-import 'result_screen.dart';
+import '../routes/routes_name.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -56,7 +57,8 @@ class HomeView extends StatelessWidget {
                                     height: 50,
                                     width: 50,
                                     decoration: BoxDecoration(
-                                      color: AppColors.themeColor.withOpacity(0.1),
+                                      color:
+                                      AppColors.themeColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     padding: const EdgeInsets.all(10),
@@ -72,7 +74,8 @@ class HomeView extends StatelessWidget {
                                     height: 50,
                                     width: 50,
                                     decoration: BoxDecoration(
-                                      color: AppColors.themeColor.withOpacity(0.1),
+                                      color:
+                                      AppColors.themeColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     padding: const EdgeInsets.all(8),
@@ -89,12 +92,13 @@ class HomeView extends StatelessWidget {
                               style: TextStyle(fontSize: 20),
                               children: [
                                 TextSpan(
-                                    text: "Code your path to success with ",
+                                    text:
+                                    "Explore, learn, and expand your mind with the power of ",
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontFamily: "Poppins")),
                                 TextSpan(
-                                    text: "CS Department",
+                                    text: "Library",
                                     style: TextStyle(
                                         color: AppColors.themeColor,
                                         fontWeight: FontWeight.bold,
@@ -104,35 +108,51 @@ class HomeView extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           viewModel.isLoading
-                              ? buildLoadingIndicator()
+                              ? ShimmerWidget()  // Use ShimmerWidget here
                               : viewModel.folderContents.isNotEmpty
-                              ? GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                            ),
-                            itemCount: viewModel.folderContents.length,
-                            itemBuilder: (context, index) {
-                              return buildFolderItem(viewModel.folderContents[index], context);
+                              ? LayoutBuilder(
+                            builder: (context, constraints) {
+                              int crossAxisCount =
+                              constraints.maxWidth > 600
+                                  ? 3
+                                  : 2; // 3 columns for wide screens
+                              return GridView.builder(
+                                shrinkWrap: true,
+                                physics:
+                                const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossAxisCount,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                ),
+                                itemCount: viewModel.folderContents.length,
+                                itemBuilder: (context, index) {
+                                  return buildFolderItem(
+                                      viewModel.folderContents[index],
+                                      context);
+                                },
+                              );
                             },
                           )
                               : Center(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment:
+                              MainAxisAlignment.center,
                               children: [
-
-                                Lottie.asset("assets/images/internetError.json"),
+                                Lottie.asset(
+                                    "assets/images/internetError.json"),
                                 Text(
-                                  viewModel.errorMessage ?? 'No files or folders found',
+                                  viewModel.errorMessage ??
+                                      'No files or folders found',
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 18),
+                                  style:
+                                  const TextStyle(fontSize: 18),
                                 ),
                               ],
                             ),
                           ),
+                          const SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -167,14 +187,13 @@ class HomeView extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (isFolder) {
-            Navigator.push(
+            Navigator.pushNamed(
               context,
-              MaterialPageRoute(
-                builder: (context) => ResultScreen(
-                  folderId: item['id'] ?? '',
-                  folderName: item['name'] ?? 'Unknown Folder',
-                ),
-              ),
+              RoutesName.resultView,
+              arguments: {
+                'folderId': item['id'] ?? '',
+                'folderName': item['name'] ?? 'Unknown Folder',
+              },
             );
           } else {
             print("File clicked: ${item['name']}");
@@ -208,35 +227,6 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
-  Widget buildLoadingIndicator() {
-    return SizedBox(
-      height: 600,
-      child: Center(
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Display two containers per row
-              crossAxisSpacing: 16, // Space between items
-              mainAxisSpacing: 16, // Space between items
-            ),
-            itemCount: 6, // Display 6 shimmer containers
-            itemBuilder: (context, index) {
-              return Container(
-                height: 150, // Adjust the height as needed
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12), // Rounded corners for the shimmer container
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
 }
 
 List<Map<String, String>> departments = [
