@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => HomeViewModel()),
-        ChangeNotifierProvider(create: (context) => FolderProvider()),
+        ChangeNotifierProvider(create: (context) => ResultScreenProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

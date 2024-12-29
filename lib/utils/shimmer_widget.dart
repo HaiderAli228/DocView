@@ -5,7 +5,7 @@ class ShimmerEffect {
   static shimmerEffect() {
 
       return SizedBox(
-        height: 600,
+        height: 800,
         child: Center(
           child: Shimmer.fromColors(
             baseColor: Colors.grey[300]!,

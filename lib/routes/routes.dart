@@ -10,20 +10,6 @@ class Routes {
       case RoutesName.homeScreenView:
         return _createRoute(const HomeView());
 
-      case RoutesName.resultView:
-        final args = settings.arguments as Map<String, dynamic>?;
-
-        if (args != null &&
-            args.containsKey('folderId') &&
-            args.containsKey('folderName')) {
-          return _createRoute(ResultScreen(
-            folderId: args['folderId'],
-            folderName: args['folderName'],
-          ));
-        } else {
-          return _errorRoute("Invalid or missing arguments for Result Screen");
-        }
-
       default:
         return _errorRoute("No Route Defined for '${settings.name}'");
     }

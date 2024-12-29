@@ -1,11 +1,11 @@
 import 'package:docsview/utils/shimmer_widget.dart';
+import 'package:docsview/view/result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
 import '../view-model/provider.dart';
-import '../routes/routes_name.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -187,13 +187,14 @@ class HomeView extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (isFolder) {
-            Navigator.pushNamed(
+            Navigator.push(
               context,
-              RoutesName.resultView,
-              arguments: {
-                'folderId': item['id'] ?? '',
-                'folderName': item['name'] ?? 'Unknown Folder',
-              },
+              MaterialPageRoute(
+                builder: (context) => ResultScreen(
+                  folderId: item['id'] ?? '',
+                  folderName: item['name'] ?? 'Unknown Folder',
+                ),
+              ),
             );
           } else {
             print("File clicked: ${item['name']}");

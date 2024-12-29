@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -17,7 +18,7 @@ class HomeViewModel extends ChangeNotifier {
   String currentFolderId = ''; // Current folder ID being viewed
   String currentFolderName = 'Root Folder'; // Name of the current folder
   List<dynamic> folderContents =
-      []; // List to store the contents of the current folder
+  []; // List to store the contents of the current folder
   bool isLoading = false; // Flag to indicate whether data is being loaded
   String? errorMessage; // Error message in case of failure
 
@@ -49,6 +50,13 @@ class HomeViewModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         folderContents = data['files'] ?? []; // Update the folder contents
+
+        // Sort folder contents by name (case-insensitive)
+        folderContents.sort((a, b) {
+          String nameA = (a['name'] ?? '').toLowerCase();
+          String nameB = (b['name'] ?? '').toLowerCase();
+          return nameA.compareTo(nameB);
+        });
       } else {
         _handleError('Error: ${response.statusCode} - ${response.body}');
       }
@@ -78,67 +86,90 @@ class HomeViewModel extends ChangeNotifier {
   }
 }
 
-class FolderProvider with ChangeNotifier {
-  List<dynamic> _folderContents = [];
-  bool _isLoading = false;
-  String? _errorMessage;
+class ResultScreenProvider extends ChangeNotifier {
+  String currentFolderId = dotenv.env['ROOT_FOLDER_ID'] ?? '';
+  String currentFolderName = "Root Folder";
+  List<dynamic> folderContents = [];
+  bool isLoading = false;
+  String? errorMessage;
+  final List<Map<String, String>> navigationStack = [];
 
-  List<dynamic> get folderContents => _folderContents;
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  /// Initialize the provider with folder ID and name.
+  void initialize(String folderId, String folderName) {
+    currentFolderId = folderId;
+    currentFolderName = folderName;
+    fetchFolderContents(folderId);
+  }
 
-  /// Fetches the contents of a given folder from Google Drive.
-  ///
-  /// [folderId] The ID of the folder whose contents are to be fetched.
+  /// Fetches folder contents from Google Drive API.
   Future<void> fetchFolderContents(String folderId) async {
-    _setLoadingState(true);
-    _errorMessage = null;
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
 
     final String apiKey = dotenv.env['API_KEY'] ?? '';
     final String url =
-        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType,webContentLink)";
+        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+    debugPrint("Fetching folder contents for Folder ID: $folderId");
 
     try {
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10)); // Timeout after 10 seconds
-
+      final response =
+      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        List<dynamic> files = data['files'] ?? [];
-
-        files.sort((a, b) =>
-            a['name']
-                ?.toLowerCase()
-                ?.compareTo(b['name']?.toLowerCase() ?? '') ??
-            0);
-
-        _folderContents = files;
+        folderContents = (data['files'] ?? [])
+          ..sort((a, b) {
+            // Ensure both names are not null and convert to lowercase before comparing
+            String nameA = (a['name'] ?? '').toLowerCase();
+            String nameB = (b['name'] ?? '').toLowerCase();
+            return nameA.compareTo(nameB);
+          });
+        isLoading = false;
+        debugPrint("Successfully fetched ${folderContents.length} items.");
       } else {
-        _handleError('Server Error: ${response.statusCode}');
+        errorMessage = "Server Error: ${response.statusCode}";
+        debugPrint(errorMessage!);
+        isLoading = false;
       }
-    } on TimeoutException catch (_) {
-      _handleError('Request timed out. Please try again.');
-    } on SocketException catch (_) {
-      _handleError('No internet connection. Please check your network.');
-    } on FormatException catch (_) {
-      _handleError('Error parsing response. Please try again later.');
+    } on TimeoutException {
+      errorMessage = "Request timed out. Please try again.";
+      debugPrint(errorMessage!);
+      isLoading = false;
+    } on SocketException {
+      errorMessage = "No internet connection. Please check your network.";
+      debugPrint(errorMessage!);
+      isLoading = false;
     } catch (e) {
-      _handleError('An unexpected error occurred: $e');
-    } finally {
-      _setLoadingState(false);
+      errorMessage = "An unexpected error occurred: $e";
+      debugPrint(errorMessage!);
+      isLoading = false;
+    }
+    notifyListeners();
+  }
+
+  /// Navigate to a subfolder.
+  void navigateToFolder(String folderId, String folderName) {
+    navigationStack.add({
+      "id": currentFolderId,
+      "name": currentFolderName,
+    });
+    currentFolderId = folderId;
+    currentFolderName = folderName;
+    debugPrint("Navigating to folder: $folderName (ID: $folderId)");
+    fetchFolderContents(folderId);
+  }
+
+  /// Navigate back to the previous folder.
+  void navigateBack() {
+    if (navigationStack.isNotEmpty) {
+      final previousFolder = navigationStack.removeLast();
+      currentFolderId = previousFolder["id"]!;
+      currentFolderName = previousFolder["name"]!;
+      debugPrint("Navigating back to folder: $currentFolderName (ID: $currentFolderId)");
+      fetchFolderContents(currentFolderId);
+    } else {
+      debugPrint("No previous folder to navigate back to.");
     }
   }
-
-  // Helper function to handle setting loading state
-  void _setLoadingState(bool state) {
-    _isLoading = state;
-    notifyListeners();
-  }
-
-  // Helper function to handle errors
-  void _handleError(String message) {
-    _errorMessage = message;
-    notifyListeners();
-  }
 }
+
