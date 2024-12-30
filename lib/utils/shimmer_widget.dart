@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerEffect {
-  static shimmerEffect() {
+
+  static shimmerEffect( {int countValue = 8}) {
 
       return SizedBox(
         height: 800,
@@ -16,7 +17,7 @@ class ShimmerEffect {
                 crossAxisSpacing: 16, // Space between items
                 mainAxisSpacing: 16, // Space between items
               ),
-              itemCount: 8, // Display 6 shimmer containers
+              itemCount: countValue, // Display 6 shimmer containers
               itemBuilder: (context, index) {
                 return Container(
                   height: 150, // Adjust the height as needed
