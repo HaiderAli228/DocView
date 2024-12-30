@@ -50,6 +50,7 @@ dependencies:
   googleapis:
   syncfusion_flutter_pdf:
   animated_text_kit: ^4.2.2
+  open_file:
   carousel_slider: ^5.0.0
   flutter_pdfview:
   shimmer:

@@ -1,6 +1,13 @@
+import 'dart:io';
+import 'package:docsview/view/pdf_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/app_colors.dart';
 import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
@@ -14,6 +21,11 @@ class ResultScreen extends StatelessWidget {
     required this.folderId,
     required this.folderName,
   });
+
+  // In the ResultScreen class
+  String generateFileUrl(String fileId, String apiKey) {
+    return "https://www.googleapis.com/drive/v3/files/$fileId?alt=media&key=$apiKey";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +81,11 @@ class ResultScreen extends StatelessWidget {
 
             final folders = provider.folderContents
                 .where((item) =>
-                    item['mimeType'] == 'application/vnd.google-apps.folder')
+            item['mimeType'] == 'application/vnd.google-apps.folder')
                 .toList();
             final files = provider.folderContents
                 .where((item) =>
-                    item['mimeType'] != 'application/vnd.google-apps.folder')
+            item['mimeType'] != 'application/vnd.google-apps.folder')
                 .toList();
 
             return SingleChildScrollView(
@@ -88,7 +100,7 @@ class ResultScreen extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount:
-                            MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                        MediaQuery.of(context).size.width > 600 ? 4 : 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
                         childAspectRatio: 1,
@@ -145,6 +157,10 @@ class ResultScreen extends StatelessWidget {
                       itemCount: files.length,
                       itemBuilder: (context, index) {
                         final file = files[index];
+                        final String fileUrl = generateFileUrl(
+                          file['id'] ?? '',
+                          dotenv.env['API_KEY'] ?? '',
+                        );
                         return Card(
                           elevation: 5,
                           color: Colors.white,
@@ -166,8 +182,7 @@ class ResultScreen extends StatelessWidget {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -181,70 +196,61 @@ class ResultScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 8),
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
-                                          // Download Button
                                           GestureDetector(
-                                            onTap: () {
-                                              // Implement file download logic here
-                                            },
+                                            onTap: () => downloadFile(
+                                              fileUrl,
+                                              file['name'] ?? 'Unknown File',
+                                            ),
                                             child: Container(
                                               width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.37, // 60% of screen width
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8),
+                                                  .size
+                                                  .width *
+                                                  0.37,
+                                              padding: const EdgeInsets.symmetric(vertical: 8),
                                               decoration: BoxDecoration(
-                                                color: Colors
-                                                    .purple, // Background color
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                                                color: Colors.purple,
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
                                               alignment: Alignment.center,
                                               child: const Text(
                                                 'Download',
                                                 style: TextStyle(
-                                                  color: Colors
-                                                      .white, // Text color
+                                                  color: Colors.white,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(
-                                              width:
-                                                  6), // Space between the buttons
-                                          // View Button
+                                          const SizedBox(width: 6),
                                           GestureDetector(
                                             onTap: () {
-                                              // Implement file view logic here
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PDFViewerScreen(pdfUrl: fileUrl),
+                                                ),
+                                              );
                                             },
                                             child: Container(
                                               width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.17, // 30% of screen width
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8),
+                                                  .size
+                                                  .width *
+                                                  0.17,
+                                              padding: const EdgeInsets.symmetric(vertical: 8),
                                               decoration: BoxDecoration(
-                                                color: Colors
-                                                    .purple, // Background color
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                                                color: Colors.purple,
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
                                               alignment: Alignment.center,
                                               child: const Text(
-                                                'View',
+                                                "View",
                                                 style: TextStyle(
-                                                  color: Colors
-                                                      .white, // Text color
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  fontSize: 16,
                                                 ),
                                               ),
                                             ),
@@ -270,8 +276,38 @@ class ResultScreen extends StatelessWidget {
   }
 
   String getDepartmentIcon(String mimeType) {
-    return mimeType == 'application/vnd.google-apps.folder'
-        ? 'assets/images/defaultIcon.png'
-        : 'assets/images/file.png';
+    if (mimeType == 'application/vnd.google-apps.folder') {
+      return 'assets/images/defaultIcon.png'; // Folder icon
+    } else {
+      return 'assets/images/file.png'; // File icon
+    }
+  }
+
+  // Download file function
+  Future<void> downloadFile(String url, String fileName) async {
+    try {
+      // Show a loading toast
+      Fluttertoast.showToast(msg: "Downloading $fileName...");
+
+      // Fetch the file from the URL
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // Get the directory for storing files
+        final directory = await getApplicationDocumentsDirectory();
+        final filePath = '${directory.path}/$fileName';
+
+        // Save the file
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+
+        // Show success toast and open the file
+        Fluttertoast.showToast(msg: "$fileName downloaded successfully.");
+        OpenFile.open(filePath);
+      } else {
+        Fluttertoast.showToast(msg: "Failed to download $fileName.");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Error: $e");
+    }
   }
 }
