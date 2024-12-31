@@ -12,6 +12,25 @@ import 'downloaded_file.dart';
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
+  void navigateToDownload(BuildContext context) {
+    // Close the drawer before navigating
+    Navigator.pop(context);
+
+    // Navigate to the DownloadedFilesScreen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const DownloadedFilesScreen(),
+      ),
+    );
+  }
+
+  Future<void> _onRefresh(BuildContext context) async {
+    // Trigger data refresh in your view model or backend call
+    final viewModel = Provider.of<HomeViewModel>(context, listen: false);
+    await viewModel.refreshData();  // Assuming you have a refreshData method in your ViewModel
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -19,49 +38,52 @@ class HomeView extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
-          drawer: _buildDrawer(),
+          drawer: _buildDrawer(context), // Pass context here
           body: Consumer<HomeViewModel>(
             builder: (context, viewModel, child) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Stack(
                   children: [
-                    SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHeader(context),
-                          RichText(
-                            text: const TextSpan(
-                              style: TextStyle(fontSize: 20),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Explore, learn, and expand your mind with the power of ",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Poppins",
+                    RefreshIndicator(
+                      onRefresh: () => _onRefresh(context),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(context),
+                            RichText(
+                              text: const TextSpan(
+                                style: TextStyle(fontSize: 20),
+                                children: [
+                                  TextSpan(
+                                    text:
+                                    "Explore, learn, and expand your mind with the power of ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: "Poppins",
+                                    ),
                                   ),
-                                ),
-                                TextSpan(
-                                  text: "Library",
-                                  style: TextStyle(
-                                    color: AppColors.themeColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: "Poppins",
+                                  TextSpan(
+                                    text: "Library",
+                                    style: TextStyle(
+                                      color: AppColors.themeColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "Poppins",
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          viewModel.isLoading
-                              ? ShimmerEffect.shimmerEffect()
-                              : viewModel.folderContents.isNotEmpty
-                                  ? _buildGridView(viewModel.folderContents)
-                                  : _buildEmptyState(viewModel.errorMessage),
-                          const SizedBox(height: 30),
-                        ],
+                            const SizedBox(height: 20),
+                            viewModel.isLoading
+                                ? ShimmerEffect.shimmerEffect()
+                                : viewModel.folderContents.isNotEmpty
+                                ? _buildGridView(viewModel.folderContents)
+                                : _buildEmptyState(viewModel.errorMessage),
+                            const SizedBox(height: 30),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -74,17 +96,28 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawer() {
+  Widget _buildDrawer(BuildContext context) {
     return Drawer(
       backgroundColor: AppColors.backgroundBodyColor,
       child: ListView(
         children: [
+          const SizedBox(
+            height: 20,
+          ),
           DrawerTile(
             iconIs: const Icon(
-              Icons.account_box,
-              color: AppColors.themeColor,
+              Icons.arrow_downward_outlined,
             ),
-            name: "Profile",
+            name: "Download",
+            function: () {
+              navigateToDownload(context); // Corrected here
+            },
+          ),
+          DrawerTile(
+            iconIs: const Icon(
+              Icons.email_outlined,
+            ),
+            name: "Contact us",
             function: () {},
           ),
         ],
@@ -107,11 +140,7 @@ class HomeView extends StatelessWidget {
             context,
             icon: FontAwesomeIcons.arrowDown,
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const DownloadedFilesScreen()),
-              );
+              navigateToDownload(context); // Corrected here
             },
           ),
         ],
@@ -130,7 +159,10 @@ class HomeView extends StatelessWidget {
           color: AppColors.themeColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: AppColors.themeColor),
+        child: Icon(
+          icon,
+          color: AppColors.themeColor,
+        ),
       ),
     );
   }
@@ -175,7 +207,7 @@ class HomeView extends StatelessWidget {
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
     String departmentIcon = departments.firstWhere(
-      (dept) => dept['name'] == item['name'],
+          (dept) => dept['name'] == item['name'],
       orElse: () => {'icon': 'assets/images/defaultIcon.png'},
     )['icon']!;
 

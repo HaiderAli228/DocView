@@ -39,6 +39,12 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  /// Refresh the data by calling the `fetchFolderContents` again.
+  Future<void> refreshData() async {
+    _setLoadingState(true);
+    await fetchFolderContents(currentFolderId);
+  }
+
   Future<http.Response?> _makeApiCall(String url) async {
     try {
       return await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
