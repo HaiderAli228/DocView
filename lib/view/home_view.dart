@@ -1,4 +1,5 @@
 import 'package:docsview/utils/shimmer_widget.dart';
+import 'package:docsview/view/downloaded_file.dart';
 import 'package:docsview/view/profile.dart';
 import 'package:docsview/view/result_screen.dart';
 import 'package:flutter/material.dart';
@@ -6,29 +7,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
 import '../view-model/provider.dart';
-import 'downloaded_file.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  void navigateToDownload(BuildContext context) {
-    // Close the drawer before navigating
-    Navigator.pop(context);
-
-    // Navigate to the DownloadedFilesScreen
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DownloadedFilesScreen(),
-      ),
-    );
-  }
-
   Future<void> _onRefresh(BuildContext context) async {
-    // Trigger data refresh in your view model or backend call
     final viewModel = Provider.of<HomeViewModel>(context, listen: false);
-    await viewModel
-        .refreshData(); // Assuming you have a refreshData method in your ViewModel
+    await viewModel.refreshData(); // Trigger data refresh in your view model
   }
 
   @override
@@ -58,7 +43,7 @@ class HomeView extends StatelessWidget {
                                 children: [
                                   TextSpan(
                                     text:
-                                        "Explore, learn, and expand your mind with the power of ",
+                                    "Explore, learn, and expand your mind with the power of ",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: "Poppins",
@@ -79,8 +64,8 @@ class HomeView extends StatelessWidget {
                             viewModel.isLoading
                                 ? ShimmerEffect.shimmerEffect()
                                 : viewModel.folderContents.isNotEmpty
-                                    ? _buildGridView(viewModel.folderContents)
-                                    : _buildEmptyState(viewModel.errorMessage),
+                                ? _buildGridView(viewModel.folderContents)
+                                : _buildEmptyState(viewModel.errorMessage),
                             const SizedBox(height: 30),
                           ],
                         ),
@@ -129,7 +114,7 @@ class HomeView extends StatelessWidget {
             context,
             icon: FontAwesomeIcons.arrowDown,
             onTap: () {
-              navigateToDownload(context); // Corrected here
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadedFilesScreen(),));
             },
           ),
         ],
@@ -195,7 +180,7 @@ class HomeView extends StatelessWidget {
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
     String departmentIcon = departments.firstWhere(
-      (dept) => dept['name'] == item['name'],
+          (dept) => dept['name'] == item['name'],
       orElse: () => {'icon': 'assets/images/defaultIcon.png'},
     )['icon']!;
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:open_file/open_file.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +15,7 @@ class DownloadedFilesScreen extends StatelessWidget {
         backgroundColor: AppColors.themeColor, // Custom theme color
         foregroundColor: Colors.white,
         title: const Text('Downloaded Files'),
+
       ),
       body: FutureBuilder<List<String>>(
         future: _getDownloadedFiles(),

@@ -345,7 +345,7 @@ class ResultScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Download Complete"),
+          title: const Text("Download Complete"),
           content: Text("Do you want to open the file '$fileName'?"),
           actions: [
             TextButton(

@@ -32,10 +32,10 @@ class HomeViewModel extends ChangeNotifier {
       if (response != null && response.statusCode == 200) {
         _processFolderData(response.body);
       } else {
-        _handleError('Error: ${response?.statusCode} - ${response?.body}');
+        _handleError('Something went wrong while fetching the data. Please try again later.');
       }
     } catch (e) {
-      _handleError(e.toString());
+      _handleError('An error occurred. Please check your internet connection or try again later.');
     }
   }
 
@@ -49,11 +49,11 @@ class HomeViewModel extends ChangeNotifier {
     try {
       return await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
     } on TimeoutException {
-      _handleError('Request timed out. Please try again.');
+      _handleError('The request timed out. Please try again later.');
     } on SocketException {
-      _handleError('No internet connection. Please check your network.');
+      _handleError('No internet connection. Please check your network settings.');
     } catch (_) {
-      _handleError('An unexpected error occurred.');
+      _handleError('An unexpected error occurred. Please try again later.');
     }
     return null;
   }
@@ -107,10 +107,10 @@ class ResultScreenProvider extends ChangeNotifier {
       if (response != null && response.statusCode == 200) {
         _processFolderData(response.body);
       } else {
-        _handleError('Server Error: ${response?.statusCode}');
+        _handleError('Something went wrong while fetching the data. Please try again later.');
       }
     } catch (e) {
-      _handleError('Error: $e');
+      _handleError('An error occurred. Please check your internet connection or try again later.');
     }
   }
 
@@ -118,11 +118,11 @@ class ResultScreenProvider extends ChangeNotifier {
     try {
       return await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
     } on TimeoutException {
-      _handleError('Request timed out. Please try again.');
+      _handleError('The request timed out. Please try again later.');
     } on SocketException {
-      _handleError('No internet connection. Please check your network.');
+      _handleError('No internet connection. Please check your network settings.');
     } catch (_) {
-      _handleError('An unexpected error occurred.');
+      _handleError('An unexpected error occurred. Please try again later.');
     }
     return null;
   }
