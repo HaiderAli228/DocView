@@ -17,21 +17,7 @@ class HomeView extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
-          drawer: Drawer(
-            backgroundColor: AppColors.backgroundBodyColor,
-            child: Column(
-              children: [
-                DrawerTile(
-                  iconIs: const Icon(
-                    Icons.account_box,
-                    color: AppColors.themeColor,
-                  ),
-                  name: "Profile",
-                  function: () {},
-                ),
-              ],
-            ),
-          ),
+          drawer: _buildDrawer(),
           body: Consumer<HomeViewModel>(
             builder: (context, viewModel, child) {
               return Padding(
@@ -42,65 +28,26 @@ class HomeView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          AppColors.themeColor.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: const EdgeInsets.all(10),
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: AppColors.themeColor,
-                                    ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          AppColors.themeColor.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: const Icon(
-                                        Icons.notifications_active,
-                                        color: AppColors.themeColor),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          _buildHeader(context),
                           RichText(
                             text: const TextSpan(
                               style: TextStyle(fontSize: 20),
                               children: [
                                 TextSpan(
-                                    text:
-                                        "Explore, learn, and expand your mind with the power of ",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: "Poppins")),
+                                  text: "Explore, learn, and expand your mind with the power of ",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
                                 TextSpan(
-                                    text: "Library",
-                                    style: TextStyle(
-                                        color: AppColors.themeColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: "Poppins")),
+                                  text: "Library",
+                                  style: TextStyle(
+                                    color: AppColors.themeColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -108,50 +55,8 @@ class HomeView extends StatelessWidget {
                           viewModel.isLoading
                               ? ShimmerEffect.shimmerEffect()
                               : viewModel.folderContents.isNotEmpty
-                                  ? LayoutBuilder(
-                                      builder: (context, constraints) {
-                                        int crossAxisCount = constraints
-                                                    .maxWidth >
-                                                600
-                                            ? 3
-                                            : 2; // 3 columns for wide screens
-                                        return GridView.builder(
-                                          shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: crossAxisCount,
-                                            crossAxisSpacing: 8,
-                                            mainAxisSpacing: 8,
-                                          ),
-                                          itemCount:
-                                              viewModel.folderContents.length,
-                                          itemBuilder: (context, index) {
-                                            return buildFolderItem(
-                                                viewModel.folderContents[index],
-                                                context);
-                                          },
-                                        );
-                                      },
-                                    )
-                                  : Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Lottie.asset(
-                                              "assets/images/internetError.json"),
-                                          Text(
-                                            viewModel.errorMessage ??
-                                                'No files or folders found',
-                                            textAlign: TextAlign.center,
-                                            style:
-                                                const TextStyle(fontSize: 18),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                              ? _buildGridView(viewModel.folderContents)
+                              : _buildEmptyState(viewModel.errorMessage),
                           const SizedBox(height: 30),
                         ],
                       ),
@@ -166,16 +71,103 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget buildFolderItem(dynamic item, BuildContext context) {
-    bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
-    String departmentIcon = 'assets/images/defaultIcon.png';
+  Widget _buildDrawer() {
+    return Drawer(
+      backgroundColor: AppColors.backgroundBodyColor,
+      child: ListView(
+        children: [
+          DrawerTile(
+            iconIs: const Icon(
+              Icons.account_box,
+              color: AppColors.themeColor,
+            ),
+            name: "Profile",
+            function: () {},
+          ),
+        ],
+      ),
+    );
+  }
 
-    for (var department in departments) {
-      if (item['name'] == department['name']) {
-        departmentIcon = department['icon'] ?? departmentIcon;
-        break;
-      }
-    }
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildIconButton(
+            context,
+            icon: Icons.menu,
+            onTap: () => Scaffold.of(context).openDrawer(),
+          ),
+          _buildIconButton(
+            context,
+            icon: Icons.notifications_active,
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconButton(BuildContext context, {required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+          color: AppColors.themeColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: AppColors.themeColor),
+      ),
+    );
+  }
+
+  Widget _buildGridView(List<dynamic> folderContents) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: folderContents.length,
+          itemBuilder: (context, index) {
+            return _buildFolderItem(folderContents[index], context);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(String? errorMessage) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Lottie.asset("assets/images/internetError.json"),
+          Text(
+            errorMessage ?? 'No files or folders found',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFolderItem(dynamic item, BuildContext context) {
+    bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
+    String departmentIcon = departments.firstWhere(
+          (dept) => dept['name'] == item['name'],
+      orElse: () => {'icon': 'assets/images/defaultIcon.png'},
+    )['icon']!;
 
     return Card(
       elevation: 8,
@@ -204,7 +196,6 @@ class HomeView extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(
                 departmentIcon,
@@ -230,7 +221,7 @@ class HomeView extends StatelessWidget {
   }
 }
 
-List<Map<String, String>> departments = [
+const List<Map<String, String>> departments = [
   {"name": "Computer", "icon": "assets/images/computer.png"},
   {"name": "Physics", "icon": "assets/images/physics.png"},
   {"name": "Chemistry", "icon": "assets/images/chemistry.png"},

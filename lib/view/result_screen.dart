@@ -22,7 +22,7 @@ class ResultScreen extends StatelessWidget {
     required this.folderName,
   });
 
-  // In the ResultScreen class
+  // Generate file URL to fetch file from Google Drive API
   String generateFileUrl(String fileId, String apiKey) {
     return "https://www.googleapis.com/drive/v3/files/$fileId?alt=media&key=$apiKey";
   }
@@ -43,6 +43,7 @@ class ResultScreen extends StatelessWidget {
             builder: (context, provider, _) => IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
+                // Navigate back if possible, otherwise pop the screen
                 if (provider.navigationStack.isNotEmpty) {
                   provider.navigateBack();
                 } else {
@@ -54,15 +55,20 @@ class ResultScreen extends StatelessWidget {
         ),
         body: Consumer<ResultScreenProvider>(
           builder: (context, provider, _) {
+            // Show shimmer effect if data is loading
             if (provider.isLoading) {
               return Padding(
                 padding: const EdgeInsets.all(20),
                 child: ShimmerEffect.shimmerEffect(countValue: 6),
               );
             }
+
+            // Show error message if there's an issue
             if (provider.errorMessage != null) {
               return Center(child: Text(provider.errorMessage!));
             }
+
+            // Show a progress animation if no folder contents are available
             if (provider.folderContents.isEmpty) {
               return Center(
                 child: Column(
@@ -79,6 +85,7 @@ class ResultScreen extends StatelessWidget {
               );
             }
 
+            // Separate folders and files from the contents
             final folders = provider.folderContents
                 .where((item) =>
             item['mimeType'] == 'application/vnd.google-apps.folder')
@@ -93,7 +100,7 @@ class ResultScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Folder Grid
+                  // Display folder grid if available
                   if (folders.isNotEmpty)
                     GridView.builder(
                       shrinkWrap: true,
@@ -113,43 +120,13 @@ class ResultScreen extends StatelessWidget {
                             folder['id'] ?? '',
                             folder['name'] ?? 'Unknown Folder',
                           ),
-                          child: Card(
-                            elevation: 8,
-                            color: Colors.white,
-                            shadowColor: Colors.grey.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    getDepartmentIcon(folder['mimeType'] ?? ''),
-                                    width: 60,
-                                    height: 60,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    folder['name'] ?? 'Unknown',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          child: _buildFolderCard(folder),
                         );
                       },
                     ),
                   const SizedBox(height: 16),
-                  // File List
+
+                  // Display file list if available
                   if (files.isNotEmpty)
                     ListView.builder(
                       shrinkWrap: true,
@@ -161,109 +138,7 @@ class ResultScreen extends StatelessWidget {
                           file['id'] ?? '',
                           dotenv.env['API_KEY'] ?? '',
                         );
-                        return Card(
-                          elevation: 5,
-                          color: Colors.white,
-                          shadowColor: Colors.grey.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  'assets/images/file.png',
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.contain,
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        file['name'] ?? 'Unknown File',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => downloadFile(
-                                              fileUrl,
-                                              file['name'] ?? 'Unknown File',
-                                            ),
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                                  0.37,
-                                              padding: const EdgeInsets.symmetric(vertical: 8),
-                                              decoration: BoxDecoration(
-                                                color: Colors.purple,
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: const Text(
-                                                'Download',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PDFViewerScreen(pdfUrl: fileUrl),
-                                                ),
-                                              );
-                                            },
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                                  0.17,
-                                              padding: const EdgeInsets.symmetric(vertical: 8),
-                                              decoration: BoxDecoration(
-                                                color: Colors.purple,
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: const Text(
-                                                "View",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                        return _buildFileCard(file, fileUrl, context);
                       },
                     ),
                 ],
@@ -275,39 +150,214 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  String getDepartmentIcon(String mimeType) {
-    if (mimeType == 'application/vnd.google-apps.folder') {
-      return 'assets/images/defaultIcon.png'; // Folder icon
-    } else {
-      return 'assets/images/file.png'; // File icon
-    }
+  // Helper function to build folder card widget
+  Widget _buildFolderCard(Map folder) {
+    return Card(
+      elevation: 8,
+      color: Colors.white,
+      shadowColor: Colors.grey.withOpacity(0.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              getDepartmentIcon(folder['mimeType'] ?? ''),
+              width: 60,
+              height: 60,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              folder['name'] ?? 'Unknown',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  // Download file function
-  Future<void> downloadFile(String url, String fileName) async {
+  // Helper function to build file card widget
+  Widget _buildFileCard(Map file, String fileUrl, BuildContext context) {
+    return Card(
+      elevation: 5,
+      color: Colors.white,
+      shadowColor: Colors.grey.withOpacity(0.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(
+              'assets/images/file.png',
+              width: 80,
+              height: 80,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    file['name'] ?? 'Unknown File',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildFileActions(fileUrl, file['name'] ?? '', context),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper function to build file action buttons (Download, View)
+  Widget _buildFileActions(
+      String fileUrl, String fileName, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width *
+              0.34, // Make download button wider
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.purple,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: GestureDetector(
+            onTap: () => downloadFile(fileUrl, fileName,context),
+            child: const Text(
+              'Download',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8), // Add some space between the buttons
+        Container(
+          width: MediaQuery.of(context).size.width *
+              0.2, // Make view button smaller
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.themeColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PDFViewerScreen(pdfUrl: fileUrl),
+                ),
+              );
+            },
+            child: const Text(
+              'View',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper function to get appropriate department icon based on mimeType
+  String getDepartmentIcon(String mimeType) {
+    return mimeType == 'application/vnd.google-apps.folder'
+        ? 'assets/images/defaultIcon.png' // Folder icon
+        : 'assets/images/file.png'; // File icon
+  }
+
+// Function to handle file download
+  Future<void> downloadFile(String url, String fileName, BuildContext context) async {
     try {
-      // Show a loading toast
+      // Show loading toast
       Fluttertoast.showToast(msg: "Downloading $fileName...");
 
-      // Fetch the file from the URL
+      // Fetch file data
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        // Get the directory for storing files
+        // Get storage directory
         final directory = await getApplicationDocumentsDirectory();
         final filePath = '${directory.path}/$fileName';
 
-        // Save the file
+        // Save file to device storage
         final file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
 
-        // Show success toast and open the file
+        // Show success message
         Fluttertoast.showToast(msg: "$fileName downloaded successfully.");
-        OpenFile.open(filePath);
+
+        // Show dialog asking if the user wants to open the file
+        _showOpenFileDialog(context, filePath, fileName);
       } else {
-        Fluttertoast.showToast(msg: "Failed to download $fileName.");
+        // Handle download failure
+        Fluttertoast.showToast(msg: "Failed to download $fileName");
       }
     } catch (e) {
+      // Handle any exceptions
       Fluttertoast.showToast(msg: "Error: $e");
     }
   }
+
+// Function to show the dialog asking if the user wants to open the file
+  void _showOpenFileDialog(BuildContext context, String filePath, String fileName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Download Complete"),
+          content: Text("Do you want to open the file '$fileName'?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                // Open the file if the user pressed "Yes"
+                OpenFile.open(filePath);
+              },
+              child: const Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
