@@ -123,20 +123,13 @@ class DownloadedFilesScreen extends StatelessWidget {
 
   // Show Lottie animation for error state
   Widget _buildErrorScreen() {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       // Wrapping with SingleChildScrollView to allow scrolling
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Something went wrong, try again later',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
-            ),
-            Lottie.asset(
-                "assets/images/internetError.json"), // Replace with your Lottie asset
-          ],
+        child: Text(
+          'Something went wrong, try again later',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18),
         ),
       ),
     );

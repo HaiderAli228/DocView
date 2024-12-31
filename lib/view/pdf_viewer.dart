@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:lottie/lottie.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -14,10 +13,10 @@ class PDFViewerScreen extends StatefulWidget {
   const PDFViewerScreen({super.key, required this.pdfUrl});
 
   @override
-  _PDFViewerScreenState createState() => _PDFViewerScreenState();
+  PDFViewerScreenState createState() => PDFViewerScreenState();
 }
 
-class _PDFViewerScreenState extends State<PDFViewerScreen> {
+class PDFViewerScreenState extends State<PDFViewerScreen> {
   String? localPath;
   bool isLoading = true;
   String? errorMessage;
@@ -135,12 +134,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Lottie.asset(
-            'assets/images/internetError.json',
-            height: 300,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 16),
           Text(
             errorMessage!,
             textAlign: TextAlign.center,

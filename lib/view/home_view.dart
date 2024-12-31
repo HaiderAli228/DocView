@@ -1,11 +1,10 @@
 import 'package:docsview/utils/shimmer_widget.dart';
+import 'package:docsview/view/profile.dart';
 import 'package:docsview/view/result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
-import '../utils/drawer_tile.dart';
 import '../view-model/provider.dart';
 import 'downloaded_file.dart';
 
@@ -28,7 +27,8 @@ class HomeView extends StatelessWidget {
   Future<void> _onRefresh(BuildContext context) async {
     // Trigger data refresh in your view model or backend call
     final viewModel = Provider.of<HomeViewModel>(context, listen: false);
-    await viewModel.refreshData();  // Assuming you have a refreshData method in your ViewModel
+    await viewModel
+        .refreshData(); // Assuming you have a refreshData method in your ViewModel
   }
 
   @override
@@ -38,7 +38,7 @@ class HomeView extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
-          drawer: _buildDrawer(context), // Pass context here
+          drawer: _buildHeader(context), // Pass context here
           body: Consumer<HomeViewModel>(
             builder: (context, viewModel, child) {
               return Padding(
@@ -58,7 +58,7 @@ class HomeView extends StatelessWidget {
                                 children: [
                                   TextSpan(
                                     text:
-                                    "Explore, learn, and expand your mind with the power of ",
+                                        "Explore, learn, and expand your mind with the power of ",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: "Poppins",
@@ -79,8 +79,8 @@ class HomeView extends StatelessWidget {
                             viewModel.isLoading
                                 ? ShimmerEffect.shimmerEffect()
                                 : viewModel.folderContents.isNotEmpty
-                                ? _buildGridView(viewModel.folderContents)
-                                : _buildEmptyState(viewModel.errorMessage),
+                                    ? _buildGridView(viewModel.folderContents)
+                                    : _buildEmptyState(viewModel.errorMessage),
                             const SizedBox(height: 30),
                           ],
                         ),
@@ -96,45 +96,34 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: AppColors.backgroundBodyColor,
-      child: ListView(
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          DrawerTile(
-            iconIs: const Icon(
-              Icons.arrow_downward_outlined,
-            ),
-            name: "Download",
-            function: () {
-              navigateToDownload(context); // Corrected here
-            },
-          ),
-          DrawerTile(
-            iconIs: const Icon(
-              Icons.email_outlined,
-            ),
-            name: "Contact us",
-            function: () {},
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildIconButton(
-            context,
-            icon: Icons.menu,
-            onTap: () => Scaffold.of(context).openDrawer(),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContactUsScreen(),
+                  ));
+            },
+            child: Container(
+              alignment: Alignment.center,
+              height: 55,
+              width: 55,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.themeColor.withOpacity(0.13),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Image(
+                image: AssetImage("assets/images/icon.png"),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           _buildIconButton(
             context,
@@ -156,7 +145,7 @@ class HomeView extends StatelessWidget {
         height: 50,
         width: 50,
         decoration: BoxDecoration(
-          color: AppColors.themeColor.withOpacity(0.1),
+          color: AppColors.themeColor.withOpacity(0.11),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
@@ -193,7 +182,6 @@ class HomeView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Lottie.asset("assets/images/internetError.json"),
           Text(
             errorMessage ?? 'No files or folders found',
             textAlign: TextAlign.center,
@@ -207,7 +195,7 @@ class HomeView extends StatelessWidget {
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
     String departmentIcon = departments.firstWhere(
-          (dept) => dept['name'] == item['name'],
+      (dept) => dept['name'] == item['name'],
       orElse: () => {'icon': 'assets/images/defaultIcon.png'},
     )['icon']!;
 

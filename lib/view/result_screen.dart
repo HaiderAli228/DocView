@@ -12,6 +12,7 @@ import '../utils/app_colors.dart';
 import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class ResultScreen extends StatelessWidget {
   final String folderId;
   final String folderName;
@@ -336,7 +337,6 @@ class ResultScreen extends StatelessWidget {
       Fluttertoast.showToast(msg: "Error: $e");
     }
   }
-
 
 // Function to show the dialog asking if the user wants to open the file
   void _showOpenFileDialog(

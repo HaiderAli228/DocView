@@ -1,7 +1,6 @@
-import 'package:docsview/routes/routes.dart';
-import 'package:docsview/routes/routes_name.dart';
 import 'package:docsview/utils/app_colors.dart';
 import 'package:docsview/view-model/provider.dart';
+import 'package:docsview/view/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -28,8 +27,7 @@ class MyApp extends StatelessWidget {
           primaryColor: AppColors.themeColor,
           primarySwatch: Colors.blue,
         ),
-        initialRoute: RoutesName.homeScreenView, // Set the initial route
-        onGenerateRoute: Routes.generatedRoutes, // Route management
+        home: const HomeView(),
       ),
     );
   }
