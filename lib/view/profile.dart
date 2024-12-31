@@ -6,15 +6,20 @@ class ContactUsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the screen size and scale it for better responsiveness
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColors.themeColor,
         foregroundColor: Colors.white,
-        title: const Text("Contact Us"),
+        title: const Text("Library"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(
+            screenWidth * 0.04), // Padding scales with screen size
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +43,7 @@ class ContactUsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                "This app is your ultimate educational companion. Designed to help students excel, it offers:",
+                "Library is your ultimate educational companion. Designed to help students excel, it offers:",
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: "Poppins",
@@ -49,7 +54,7 @@ class ContactUsScreen extends StatelessWidget {
 
               // Features Section
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(screenWidth * 0.04),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
@@ -162,7 +167,8 @@ class ContactUsScreen extends StatelessWidget {
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20), // Ensure the gradient overlay follows the image's rounded corners
+                        borderRadius: BorderRadius.circular(
+                            20), // Ensure the gradient overlay follows the image's rounded corners
                         gradient: LinearGradient(
                           colors: [
                             Colors.black.withOpacity(0.6),
@@ -172,17 +178,19 @@ class ContactUsScreen extends StatelessWidget {
                           end: Alignment.topRight,
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                      padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.02,
+                          horizontal: screenWidth * 0.05),
                       child: const Align(
                         alignment: Alignment.bottomCenter,
                         child: Text(
-                          "\" Even in a place where potential is overlooked, I chose to rise above and leave my mark .\" ",
+                          "\" Don’t let the world define you. stand out and leave a legacy that can’t be overlooked .\" — Haider Ali ",
                           style: TextStyle(
-                            fontSize: 16,
-
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: "Poppins",
-                            color: Colors.white, // White text on dark background
+                            color:
+                                Colors.white, // White text on dark background
                           ),
                           textAlign: TextAlign.left,
                         ),
@@ -196,7 +204,7 @@ class ContactUsScreen extends StatelessWidget {
 
               // Services Section
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(screenWidth * 0.04),
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(15),
@@ -245,7 +253,7 @@ class ContactUsScreen extends StatelessWidget {
 
               // Contact Information Section
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(screenWidth * 0.04),
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(15),
@@ -297,8 +305,6 @@ class ContactUsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-
-
             ],
           ),
         ),
