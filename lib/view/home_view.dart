@@ -1,11 +1,13 @@
 import 'package:docsview/utils/shimmer_widget.dart';
 import 'package:docsview/view/result_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
 import '../utils/drawer_tile.dart';
 import '../view-model/provider.dart';
+import 'downloaded_file.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -34,7 +36,8 @@ class HomeView extends StatelessWidget {
                               style: TextStyle(fontSize: 20),
                               children: [
                                 TextSpan(
-                                  text: "Explore, learn, and expand your mind with the power of ",
+                                  text:
+                                      "Explore, learn, and expand your mind with the power of ",
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontFamily: "Poppins",
@@ -55,8 +58,8 @@ class HomeView extends StatelessWidget {
                           viewModel.isLoading
                               ? ShimmerEffect.shimmerEffect()
                               : viewModel.folderContents.isNotEmpty
-                              ? _buildGridView(viewModel.folderContents)
-                              : _buildEmptyState(viewModel.errorMessage),
+                                  ? _buildGridView(viewModel.folderContents)
+                                  : _buildEmptyState(viewModel.errorMessage),
                           const SizedBox(height: 30),
                         ],
                       ),
@@ -102,15 +105,22 @@ class HomeView extends StatelessWidget {
           ),
           _buildIconButton(
             context,
-            icon: Icons.notifications_active,
-            onTap: () {},
+            icon: FontAwesomeIcons.arrowDown,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const DownloadedFilesScreen()),
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildIconButton(BuildContext context, {required IconData icon, required VoidCallback onTap}) {
+  Widget _buildIconButton(BuildContext context,
+      {required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -165,7 +175,7 @@ class HomeView extends StatelessWidget {
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
     String departmentIcon = departments.firstWhere(
-          (dept) => dept['name'] == item['name'],
+      (dept) => dept['name'] == item['name'],
       orElse: () => {'icon': 'assets/images/defaultIcon.png'},
     )['icon']!;
 

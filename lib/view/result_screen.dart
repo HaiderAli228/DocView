@@ -11,7 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/app_colors.dart';
 import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class ResultScreen extends StatelessWidget {
   final String folderId;
   final String folderName;
@@ -88,11 +88,11 @@ class ResultScreen extends StatelessWidget {
             // Separate folders and files from the contents
             final folders = provider.folderContents
                 .where((item) =>
-            item['mimeType'] == 'application/vnd.google-apps.folder')
+                    item['mimeType'] == 'application/vnd.google-apps.folder')
                 .toList();
             final files = provider.folderContents
                 .where((item) =>
-            item['mimeType'] != 'application/vnd.google-apps.folder')
+                    item['mimeType'] != 'application/vnd.google-apps.folder')
                 .toList();
 
             return SingleChildScrollView(
@@ -107,7 +107,7 @@ class ResultScreen extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount:
-                        MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                            MediaQuery.of(context).size.width > 600 ? 4 : 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
                         childAspectRatio: 1,
@@ -248,7 +248,7 @@ class ResultScreen extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () => downloadFile(fileUrl, fileName,context),
+            onTap: () => downloadFile(fileUrl, fileName, context),
             child: const Text(
               'Download',
               style: TextStyle(
@@ -299,40 +299,48 @@ class ResultScreen extends StatelessWidget {
         : 'assets/images/file.png'; // File icon
   }
 
-// Function to handle file download
-  Future<void> downloadFile(String url, String fileName, BuildContext context) async {
+  Future<void> storeFileMetadata(String fileName, String filePath) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> storedFiles = prefs.getStringList('downloaded_files') ?? [];
+
+    // Create a metadata entry (e.g., fileName: filePath)
+    String metadata = '$fileName:$filePath';
+    storedFiles.add(metadata);
+
+    // Save the list of file metadata back to SharedPreferences
+    await prefs.setStringList('downloaded_files', storedFiles);
+  }
+
+  Future<void> downloadFile(
+      String url, String fileName, BuildContext context) async {
     try {
-      // Show loading toast
       Fluttertoast.showToast(msg: "Downloading $fileName...");
 
-      // Fetch file data
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        // Get storage directory
         final directory = await getApplicationDocumentsDirectory();
         final filePath = '${directory.path}/$fileName';
 
-        // Save file to device storage
         final file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
 
-        // Show success message
-        Fluttertoast.showToast(msg: "$fileName downloaded successfully.");
+        // Store file metadata in SharedPreferences
+        await storeFileMetadata(fileName, filePath);
 
-        // Show dialog asking if the user wants to open the file
+        Fluttertoast.showToast(msg: "$fileName downloaded successfully.");
         _showOpenFileDialog(context, filePath, fileName);
       } else {
-        // Handle download failure
         Fluttertoast.showToast(msg: "Failed to download $fileName");
       }
     } catch (e) {
-      // Handle any exceptions
       Fluttertoast.showToast(msg: "Error: $e");
     }
   }
 
+
 // Function to show the dialog asking if the user wants to open the file
-  void _showOpenFileDialog(BuildContext context, String filePath, String fileName) {
+  void _showOpenFileDialog(
+      BuildContext context, String filePath, String fileName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -359,5 +367,4 @@ class ResultScreen extends StatelessWidget {
       },
     );
   }
-
 }
