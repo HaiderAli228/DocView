@@ -44,3 +44,6 @@ app.*.map.json
 
 # Environment variables
 .env
+
+# Keystore files (ignore release key files)
+my-release-key.jks

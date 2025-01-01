@@ -68,7 +68,6 @@ class ResultScreen extends StatelessWidget {
             if (provider.errorMessage != null) {
               return Center(child: Text(provider.errorMessage!));
             }
-
             // Show a progress animation if no folder contents are available
             if (provider.folderContents.isEmpty) {
               return Center(

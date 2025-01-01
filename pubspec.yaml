@@ -37,26 +37,16 @@ dependencies:
   cupertino_icons:
   font_awesome_flutter: ^10.8.0
   http: ^1.2.2
-  image_picker: ^1.1.2
-  file_picker: ^8.1.4
   path_provider: ^2.1.5
-  http_parser:
   provider:
-  googleapis_auth:
-  google_generative_ai:
   lottie: ^3.1.3
   syncfusion_flutter_pdfviewer:
   fluttertoast: ^8.2.8
-  googleapis:
-  syncfusion_flutter_pdf:
-  animated_text_kit: ^4.2.2
   open_file:
   shared_preferences:
-  carousel_slider: ^5.0.0
   flutter_pdfview:
   shimmer:
   flutter_dotenv:
-  docx_to_text:
   flutter_native_splash:
   url_launcher:
 #  flutter_pdfview:

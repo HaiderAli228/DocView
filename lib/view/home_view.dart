@@ -43,7 +43,7 @@ class HomeView extends StatelessWidget {
                                 children: [
                                   TextSpan(
                                     text:
-                                    "Explore, learn, and expand your mind with the power of ",
+                                        "Explore, learn, and expand your mind with the power of ",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: "Poppins",
@@ -64,8 +64,8 @@ class HomeView extends StatelessWidget {
                             viewModel.isLoading
                                 ? ShimmerEffect.shimmerEffect()
                                 : viewModel.folderContents.isNotEmpty
-                                ? _buildGridView(viewModel.folderContents)
-                                : _buildEmptyState(viewModel.errorMessage),
+                                    ? _buildGridView(viewModel.folderContents)
+                                    : Center(child: _buildEmptyState(viewModel.errorMessage)),
                             const SizedBox(height: 30),
                           ],
                         ),
@@ -114,7 +114,11 @@ class HomeView extends StatelessWidget {
             context,
             icon: FontAwesomeIcons.arrowDown,
             onTap: () {
-             Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadedFilesScreen(),));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DownloadedFilesScreen(),
+                  ));
             },
           ),
         ],
@@ -180,7 +184,7 @@ class HomeView extends StatelessWidget {
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
     String departmentIcon = departments.firstWhere(
-          (dept) => dept['name'] == item['name'],
+      (dept) => dept['name'] == item['name'],
       orElse: () => {'icon': 'assets/images/defaultIcon.png'},
     )['icon']!;
 
