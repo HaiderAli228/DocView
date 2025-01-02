@@ -97,9 +97,9 @@ class HomeView extends StatelessWidget {
             },
             child: Container(
               alignment: Alignment.center,
-              height: 55,
-              width: 55,
-              padding: const EdgeInsets.all(6),
+              height: 50,
+              width: 50,
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppColors.themeColor.withOpacity(0.13),
                 borderRadius: BorderRadius.circular(10),
@@ -174,7 +174,7 @@ class HomeView extends StatelessWidget {
           Text(
             errorMessage ?? 'No files or folders found',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: 16),
           ),
         ],
       ),
