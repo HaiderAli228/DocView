@@ -166,8 +166,8 @@ class ResultScreen extends StatelessWidget {
           children: [
             Image.asset(
               getDepartmentIcon(folder['mimeType'] ?? ''),
-              width: 60,
-              height: 60,
+              width: 50,
+              height: 50,
             ),
             const SizedBox(height: 8),
             Text(
@@ -202,8 +202,8 @@ class ResultScreen extends StatelessWidget {
           children: [
             Image.asset(
               'assets/images/file.png',
-              width: 80,
-              height: 80,
+              width: 55,
+              height: 55,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 16),
@@ -314,7 +314,11 @@ class ResultScreen extends StatelessWidget {
   Future<void> downloadFile(
       String url, String fileName, BuildContext context) async {
     try {
-      Fluttertoast.showToast(msg: "Downloading $fileName...");
+      Fluttertoast.showToast(
+          backgroundColor: AppColors.themeColor,
+          gravity: ToastGravity.CENTER,
+          textColor: Colors.white,
+          msg: "Downloading $fileName...");
 
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -344,6 +348,9 @@ class ResultScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
+          elevation: 6,
+          iconColor: AppColors.themeColor,
           title: const Text("Download Complete"),
           content: Text("Do you want to open the file '$fileName'?"),
           actions: [
