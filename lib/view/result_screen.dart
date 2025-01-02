@@ -108,8 +108,8 @@ class ResultScreen extends StatelessWidget {
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount:
                             MediaQuery.of(context).size.width > 600 ? 4 : 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 17,
+                        mainAxisSpacing: 17,
                         childAspectRatio: 1,
                       ),
                       itemCount: folders.length,

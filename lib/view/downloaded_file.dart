@@ -15,7 +15,6 @@ class DownloadedFilesScreen extends StatelessWidget {
         backgroundColor: AppColors.themeColor, // Custom theme color
         foregroundColor: Colors.white,
         title: const Text('Downloaded Files'),
-
       ),
       body: FutureBuilder<List<String>>(
         future: _getDownloadedFiles(),
@@ -38,14 +37,16 @@ class DownloadedFilesScreen extends StatelessWidget {
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              // Ensure 2 items per row
-              int crossAxisCount = 2;
+              double screenWidth = constraints.maxWidth;
+
+              // Determine the number of items per row dynamically based on screen size
+              int crossAxisCount = (screenWidth ~/ 180)
+                  .clamp(2, 4); // Minimum 2 items, maximum 4 items per row
 
               return GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      crossAxisCount, // Set to 2 for two items per row
-                  childAspectRatio: 1.0, // Aspect ratio for each grid item
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: 0.8, // Adjust the ratio for a better look
                 ),
                 itemCount: downloadedFiles.length,
                 itemBuilder: (context, index) {
@@ -69,17 +70,18 @@ class DownloadedFilesScreen extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.book, // Book icon
                               color: AppColors.themeColor, // Custom color
-                              size: 40,
+                              size: screenWidth * 0.08, // Responsive icon size
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: screenWidth * 0.02),
                             Text(
                               fileName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize:
+                                    screenWidth * 0.035, // Responsive font
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -102,10 +104,8 @@ class DownloadedFilesScreen extends StatelessWidget {
     return prefs.getStringList('downloaded_files') ?? [];
   }
 
-  // Show Lottie animation when there are no downloaded files
   Widget _buildNoFilesScreen() {
     return const SingleChildScrollView(
-      // Wrapping with SingleChildScrollView to allow scrolling
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -121,10 +121,8 @@ class DownloadedFilesScreen extends StatelessWidget {
     );
   }
 
-  // Show Lottie animation for error state
   Widget _buildErrorScreen() {
     return const SingleChildScrollView(
-      // Wrapping with SingleChildScrollView to allow scrolling
       child: Center(
         child: Text(
           'Something went wrong, try again later',
