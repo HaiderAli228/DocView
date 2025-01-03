@@ -33,7 +33,7 @@ class ResultScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ResultScreenProvider()..initialize(folderId, folderName),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor:Colors.white,
         appBar: AppBar(
           backgroundColor: AppColors.themeColor,
           foregroundColor: Colors.white,
@@ -190,8 +190,9 @@ class ResultScreen extends StatelessWidget {
   Widget _buildFileCard(Map file, String fileUrl, BuildContext context) {
     return Card(
       elevation: 5,
-      color: Colors.white,
+      color: Colors.white.withOpacity(0.95),
       shadowColor: Colors.grey.withOpacity(0.5),
+      margin: const EdgeInsets.only(bottom: 25),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -219,7 +220,7 @@ class ResultScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
+                    maxLines: 3,
                   ),
                   const SizedBox(height: 8),
                   _buildFileActions(fileUrl, file['name'] ?? '', context),
@@ -240,8 +241,9 @@ class ResultScreen extends StatelessWidget {
       children: [
         Container(
           width: MediaQuery.of(context).size.width *
-              0.34, // Make download button wider
-          padding: const EdgeInsets.symmetric(vertical: 10),
+              0.42, // Make download button wider
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          margin: const EdgeInsets.symmetric(vertical: 5),
           decoration: BoxDecoration(
             color: Colors.purple,
             borderRadius: BorderRadius.circular(8),
@@ -263,7 +265,8 @@ class ResultScreen extends StatelessWidget {
         Container(
           width: MediaQuery.of(context).size.width *
               0.2, // Make view button smaller
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          margin: const EdgeInsets.symmetric(vertical: 5),
           decoration: BoxDecoration(
             color: AppColors.themeColor,
             borderRadius: BorderRadius.circular(8),

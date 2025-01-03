@@ -11,10 +11,6 @@ import '../view-model/provider.dart';
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  Future<void> _onRefresh(BuildContext context) async {
-    final viewModel = Provider.of<HomeViewModel>(context, listen: false);
-    await viewModel.refreshData(); // Trigger data refresh in your view model
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,45 +26,42 @@ class HomeView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Stack(
                   children: [
-                    RefreshIndicator(
-                      onRefresh: () => _onRefresh(context),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(context),
-                            RichText(
-                              text: const TextSpan(
-                                style: TextStyle(fontSize: 20),
-                                children: [
-                                  TextSpan(
-                                    text:
-                                        "Explore, learn, and expand your mind with the power of ",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Poppins",
-                                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(context),
+                          RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontSize: 20),
+                              children: [
+                                TextSpan(
+                                  text:
+                                      "Explore, learn, and expand your mind with the power of ",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: "Poppins",
                                   ),
-                                  TextSpan(
-                                    text: "Library",
-                                    style: TextStyle(
-                                      color: AppColors.themeColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Poppins",
-                                    ),
+                                ),
+                                TextSpan(
+                                  text: "Library",
+                                  style: TextStyle(
+                                    color: AppColors.themeColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Poppins",
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 20),
-                            viewModel.isLoading
-                                ? ShimmerEffect.shimmerEffect()
-                                : viewModel.folderContents.isNotEmpty
-                                    ? _buildGridView(viewModel.folderContents)
-                                    : Center(child: _buildEmptyState(viewModel.errorMessage)),
-                            const SizedBox(height: 30),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 20),
+                          viewModel.isLoading
+                              ? ShimmerEffect.shimmerEffect()
+                              : viewModel.folderContents.isNotEmpty
+                                  ? _buildGridView(viewModel.folderContents)
+                                  : Center(child: _buildEmptyState(viewModel.errorMessage)),
+                          const SizedBox(height: 30),
+                        ],
                       ),
                     ),
                   ],
@@ -97,8 +90,8 @@ class HomeView extends StatelessWidget {
             },
             child: Container(
               alignment: Alignment.center,
-              height: 50,
-              width: 50,
+              height: 52,
+              width: 52,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppColors.themeColor.withOpacity(0.13),

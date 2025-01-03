@@ -58,7 +58,7 @@ class ContactUsScreen extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +155,7 @@ class ContactUsScreen extends StatelessWidget {
                 children: [
                   // Full width image with increased height and rounded corners
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
                       "assets/images/profile.jpg",
                       width: double.infinity, // Image takes full width
@@ -168,7 +168,7 @@ class ContactUsScreen extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
-                            10), // Ensure the gradient overlay follows the image's rounded corners
+                            15), // Ensure the gradient overlay follows the image's rounded corners
                         gradient: LinearGradient(
                           colors: [
                             Colors.black.withOpacity(0.6),
@@ -207,7 +207,7 @@ class ContactUsScreen extends StatelessWidget {
                 padding: EdgeInsets.all(screenWidth * 0.04),
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +256,7 @@ class ContactUsScreen extends StatelessWidget {
                 padding: EdgeInsets.all(screenWidth * 0.04),
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
