@@ -142,7 +142,7 @@ class ContactUsScreen extends StatelessWidget {
 
               // Vision Section
               const Text(
-                "Our Vision",
+                "Message for you ",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -200,9 +200,7 @@ class ContactUsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               // Services Section
               Container(
                 padding: EdgeInsets.all(screenWidth * 0.04),
