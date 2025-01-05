@@ -183,8 +183,9 @@ class ContactUsScreen extends StatelessWidget {
                           horizontal: screenWidth * 0.05),
                       child: const Align(
                         alignment: Alignment.bottomCenter,
+                        // Do what you can, with what you have, where you are
                         child: Text(
-                          "\" Don’t let the world define you. stand out and leave a legacy that can’t be overlooked .\" — Haider Ali ",
+                          "\" Don’t let the world define you. Stand out and leave a legacy that can’t be overlooked .\" — Haider Ali ",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
