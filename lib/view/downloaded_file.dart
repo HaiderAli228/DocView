@@ -54,7 +54,6 @@ class DownloadedFilesScreen extends StatelessWidget {
                   final fileParts = fileMetadata.split(':');
                   final fileName = fileParts[0];
                   final filePath = fileParts[1];
-
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
