@@ -63,7 +63,6 @@ class ResultScreen extends StatelessWidget {
                 child: ShimmerEffect.shimmerEffect(countValue: 6),
               );
             }
-
             // Show error message if there's an issue
             if (provider.errorMessage != null) {
               return Center(child: Text(provider.errorMessage!));
