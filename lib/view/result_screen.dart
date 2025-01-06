@@ -33,7 +33,7 @@ class ResultScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ResultScreenProvider()..initialize(folderId, folderName),
       child: Scaffold(
-        backgroundColor:Colors.white,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: AppColors.themeColor,
           foregroundColor: Colors.white,
