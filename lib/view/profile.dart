@@ -30,7 +30,7 @@ class ContactUsScreen extends StatelessWidget {
                   Text(
                     "Welcome to Library",
                     style: TextStyle(
-                      fontSize: 23,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       fontFamily: "Poppins",
                       color: Colors.black87,
@@ -45,7 +45,7 @@ class ContactUsScreen extends StatelessWidget {
               const Text(
                 "Library is your ultimate educational companion. Designed to help students excel, it offers:",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontFamily: "Poppins",
                   color: Colors.black87,
                 ),
@@ -66,7 +66,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Access to books and handy notes.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -74,7 +74,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Midterm and final past papers.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -82,7 +82,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Detailed course outlines.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -90,7 +90,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Important topics and questions.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -98,7 +98,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Final year project ideas.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -106,7 +106,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Department-wise study material.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -114,7 +114,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Semester-wise study guides and exam strategies.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -122,7 +122,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Research topics and ideas for academic exploration.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -144,7 +144,7 @@ class ContactUsScreen extends StatelessWidget {
               const Text(
                 "Message for you ",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   fontFamily: "Poppins",
                   color: Colors.black87,
@@ -214,7 +214,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "Our Services",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 19,
                         fontWeight: FontWeight.bold,
                         fontFamily: "Poppins",
                         color: Colors.black87,
@@ -224,7 +224,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Website Development",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -232,7 +232,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Personalized project mentorship.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -240,7 +240,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "• Cutting-edge app development solutions.",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
@@ -263,7 +263,7 @@ class ContactUsScreen extends StatelessWidget {
                     Text(
                       "Contact Information",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 19,
                         fontWeight: FontWeight.bold,
                         fontFamily: "Poppins",
                         color: Colors.black87,
@@ -278,7 +278,7 @@ class ContactUsScreen extends StatelessWidget {
                         Text(
                           "flutter2830@gmail.com",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w500,
                             fontFamily: "Poppins",
                           ),
@@ -293,7 +293,7 @@ class ContactUsScreen extends StatelessWidget {
                         Text(
                           "0349-6292972",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w500,
                             fontFamily: "Poppins",
                           ),
