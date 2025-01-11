@@ -54,46 +54,7 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          Card(
-                            elevation: 8,
-                            color: Colors.white,
-                            shadowColor: Colors.grey.withOpacity(0.4),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: SizedBox(
-                              height: 130,
-                              width: double.infinity,
-                              child: InkWell(
-                                onTap: () {},
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(
-                                        "assets/images/english.png",
-                                        width: 50,
-                                        height: 50,
-                                        fit: BoxFit.contain,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      const Text(
-                                        "MBBS",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontFamily: 'Poppins',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
+
                           viewModel.isLoading
                               ? ShimmerEffect.shimmerEffect()
                               : viewModel.folderContents.isNotEmpty
