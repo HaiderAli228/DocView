@@ -15,73 +15,74 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeViewModel(),
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          drawer: _buildHeader(context),
-          body: Consumer<HomeViewModel>(
-            builder: (context, viewModel, child) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          _buildHeader(context),
-                          RichText(
-                            text: const TextSpan(
-                              style: TextStyle(fontSize: 20),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Explore, learn, and expand your mind with the power of ",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Poppins",
-                                  ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        drawer: _buildHeader(context),
+        body: Consumer<HomeViewModel>(
+          builder: (context, viewModel, child) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        _buildHeader(context),
+                        RichText(
+                          text: const TextSpan(
+                            style: TextStyle(fontSize: 20),
+                            children: [
+                              TextSpan(
+                                text:
+                                    "Explore, learn, and expand your mind with the power of ",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: "Poppins",
                                 ),
-                                TextSpan(
-                                  text: "Library",
-                                  style: TextStyle(
-                                    color: AppColors.themeColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: "Poppins",
-                                  ),
+                              ),
+                              TextSpan(
+                                text: "Library",
+                                style: TextStyle(
+                                  color: AppColors.themeColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: "Poppins",
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 10),
-                          _buildSectionTitle("Medical Science"),
-                          const SizedBox(height: 10),
-                          viewModel.isLoading
-                              ? ShimmerEffect.shimmerEffect()
-                              : _buildFilteredSection(
-                                  viewModel.folderContents,
-                                  "MBBS",
-                                  "",
-                                ),
-                          const SizedBox(height: 20),
-                          _buildSectionTitle("BS Programs"),
-                          const SizedBox(height: 10),
-                          viewModel.isLoading
-                              ? ShimmerEffect.shimmerEffect()
-                              : _buildFilteredSection(
-                                  viewModel.folderContents,
-                                  "Other",
-                                  "\n\n\n Something went wrong, check your internet connection",
-                                ),
-                          const SizedBox(height: 30),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSectionTitle("Medical Science"),
+                        const SizedBox(height: 10),
+                        viewModel.isLoading
+                            ? ShimmerEffect.shimmerEffect()
+                            : _buildFilteredSection(
+                                viewModel.folderContents,
+                                "MBBS",
+                                "",
+                              ),
+                        const SizedBox(height: 20),
+                        _buildSectionTitle("BS Programs"),
+                        const SizedBox(height: 10),
+                        viewModel.isLoading
+                            ? ShimmerEffect.shimmerEffect()
+                            : _buildFilteredSection(
+                                viewModel.folderContents,
+                                "Other",
+                                "\n\n\n Something went wrong, check your internet connection",
+                              ),
+                        const SizedBox(height: 30),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
