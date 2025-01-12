@@ -18,7 +18,7 @@ class HomeView extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           backgroundColor: Colors.white,
-          drawer: _buildHeader(context), // Pass context here
+          drawer: _buildHeader(context),
           body: Consumer<HomeViewModel>(
             builder: (context, viewModel, child) {
               return Padding(
@@ -54,96 +54,25 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          const Text(
-                            "Medical Science",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
-                                color: Colors.black),
-                          ),
+                          _buildSectionTitle("Medical Science"),
                           const SizedBox(height: 10),
-                          SizedBox(
-                            height:
-                                220, // Total height for each item (image + text)
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 5, // Replace with your list length
-                              itemBuilder: (context, index) {
-                                double cardWidth =
-                                    MediaQuery.of(context).size.width *
-                                        0.45; // 40% of screen width
-                                return Container(
-                                  width: cardWidth,
-                                  margin: const EdgeInsets.only(right: 15),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                        flex:
-                                            3, // Image takes 3/4 of the card height
-                                        child: ClipRRect(
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                          ),
-                                          child: Image.asset(
-                                            "assets/images/botany.png", // Replace with your image path
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex:
-                                            1, // Text takes 1/4 of the card height
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                            color: AppColors.themeColor,
-                                            borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10),
-                                            ),
-                                          ),
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          child: const Text(
-                                            "First Year", // Replace with your data
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const Text(
-                            "BS Programs",
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black),
-                          ),
                           viewModel.isLoading
                               ? ShimmerEffect.shimmerEffect()
-                              : viewModel.folderContents.isNotEmpty
-                                  ? _buildGridView(viewModel.folderContents)
-                                  : Center(
-                                      child: _buildEmptyState(
-                                          viewModel.errorMessage)),
+                              : _buildFilteredSection(
+                                  viewModel.folderContents,
+                                  "MBBS",
+                                  "No MBBS folders found",
+                                ),
+                          const SizedBox(height: 20),
+                          _buildSectionTitle("BS Programs"),
+                          const SizedBox(height: 10),
+                          viewModel.isLoading
+                              ? ShimmerEffect.shimmerEffect()
+                              : _buildFilteredSection(
+                                  viewModel.folderContents,
+                                  "Other",
+                                  "No other department folders found",
+                                ),
                           const SizedBox(height: 30),
                         ],
                       ),
@@ -187,9 +116,7 @@ class HomeView extends StatelessWidget {
               ),
             ),
           ),
-          _buildIconButton(
-            context,
-            icon: FontAwesomeIcons.arrowDown,
+          InkWell(
             onTap: () {
               Navigator.push(
                   context,
@@ -197,27 +124,114 @@ class HomeView extends StatelessWidget {
                     builder: (context) => const DownloadedFilesScreen(),
                   ));
             },
+            child: Container(
+                alignment: Alignment.center,
+                height: 50,
+                width: 50,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.themeColor.withOpacity(0.13),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.arrowDown,
+                  color: AppColors.themeColor,
+                )),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildIconButton(BuildContext context,
-      {required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 50,
-        width: 50,
-        decoration: BoxDecoration(
-          color: AppColors.themeColor.withOpacity(0.11),
-          borderRadius: BorderRadius.circular(10),
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+          fontWeight: FontWeight.w500, fontSize: 20, color: Colors.black),
+    );
+  }
+
+  Widget _buildFilteredSection(
+    List<dynamic> folderContents,
+    String filter,
+    String emptyMessage,
+  ) {
+    final filteredItems = folderContents.where((item) {
+      if (filter == "MBBS") {
+        return item['name'].toString().toUpperCase().startsWith("MBBS");
+      } else {
+        return !item['name'].toString().toUpperCase().startsWith("MBBS");
+      }
+    }).toList();
+
+    if (filteredItems.isEmpty) {
+      return Center(child: _buildEmptyState(emptyMessage));
+    }
+
+    return filter == "MBBS"
+        ? _buildHorizontalList(filteredItems)
+        : _buildGridView(filteredItems);
+  }
+
+  Widget _buildHorizontalList(List<dynamic> items) {
+    return SizedBox(
+      height: 240,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.only(
+          top: 10,
+          bottom: 10,
         ),
-        child: Icon(
-          icon,
-          color: AppColors.themeColor,
-        ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultScreen(
+                    folderId: item['id'],
+                    folderName: item['name'],
+                  ),
+                ),
+              );
+            },
+            child: Card(
+              elevation: 4,
+              color: Colors.white,
+              shadowColor: Colors.grey.withOpacity(0.4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Image.asset(
+                        departmentIcon(item),
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      item['name'] ?? 'Unknown',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -260,10 +274,6 @@ class HomeView extends StatelessWidget {
 
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
-    String departmentIcon = departments.firstWhere(
-      (dept) => dept['name'] == item['name'],
-      orElse: () => {'icon': 'assets/images/defaultIcon.png'},
-    )['icon']!;
 
     return Card(
       elevation: 8,
@@ -284,8 +294,6 @@ class HomeView extends StatelessWidget {
                 ),
               ),
             );
-          } else {
-            print("File clicked: ${item['name']}");
           }
         },
         child: Padding(
@@ -294,12 +302,12 @@ class HomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                departmentIcon,
+                departmentIcon(item),
                 width: 50,
                 height: 50,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 14),
               Text(
                 item['name'] ?? 'Unknown',
                 style: const TextStyle(
@@ -315,6 +323,20 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
+
+  String departmentIcon(dynamic item) {
+    // Update this function to handle MBBS items and their respective images
+    if (item['name'].contains('MBBS')) {
+      return departments.firstWhere(
+        (dept) => dept['name'] == item['name'],
+        orElse: () => {'icon': 'assets/images/defaultIcon.png'},
+      )['icon']!;
+    }
+    return departments.firstWhere(
+      (dept) => dept['name'] == item['name'],
+      orElse: () => {'icon': 'assets/images/defaultIcon.png'},
+    )['icon']!;
+  }
 }
 
 const List<Map<String, String>> departments = [
@@ -327,5 +349,9 @@ const List<Map<String, String>> departments = [
   {"name": "Islamiyat", "icon": "assets/images/islam.png"},
   {"name": "English", "icon": "assets/images/english.png"},
   {"name": "Economy", "icon": "assets/images/bba.png"},
-  {"name": "Medical Data", "icon": "assets/images/mbbs.png"},
+  {"name": "MBBS 1st Year", "icon": "assets/images/6.jpg"},
+  {"name": "MBBS 2nd Year", "icon": "assets/images/7.jpg"},
+  {"name": "MBBS 3rd Year", "icon": "assets/images/8.jpg"},
+  {"name": "MBBS 4th Year", "icon": "assets/images/9.jpg"},
+  {"name": "MBBS Last Year", "icon": "assets/images/10.jpg"},
 ];
