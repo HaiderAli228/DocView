@@ -28,7 +28,7 @@ class HomeView extends StatelessWidget {
                     SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: <Widget>[
                           _buildHeader(context),
                           RichText(
                             text: const TextSpan(
@@ -53,8 +53,90 @@ class HomeView extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 20),
-
+                          const SizedBox(height: 10),
+                          const Text(
+                            "Medical Science",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: Colors.black),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height:
+                                220, // Total height for each item (image + text)
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 5, // Replace with your list length
+                              itemBuilder: (context, index) {
+                                double cardWidth =
+                                    MediaQuery.of(context).size.width *
+                                        0.45; // 40% of screen width
+                                return Container(
+                                  width: cardWidth,
+                                  margin: const EdgeInsets.only(right: 15),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        flex:
+                                            3, // Image takes 3/4 of the card height
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                          ),
+                                          child: Image.asset(
+                                            "assets/images/botany.png", // Replace with your image path
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex:
+                                            1, // Text takes 1/4 of the card height
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.themeColor,
+                                            borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(10),
+                                              bottomRight: Radius.circular(10),
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          child: const Text(
+                                            "First Year", // Replace with your data
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Text(
+                            "BS Programs",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black),
+                          ),
                           viewModel.isLoading
                               ? ShimmerEffect.shimmerEffect()
                               : viewModel.folderContents.isNotEmpty
@@ -245,4 +327,5 @@ const List<Map<String, String>> departments = [
   {"name": "Islamiyat", "icon": "assets/images/islam.png"},
   {"name": "English", "icon": "assets/images/english.png"},
   {"name": "Economy", "icon": "assets/images/bba.png"},
+  {"name": "Medical Data", "icon": "assets/images/mbbs.png"},
 ];
