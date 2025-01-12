@@ -5,7 +5,6 @@ import 'package:docsview/view/result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:lottie/lottie.dart'; // Import Lottie
 import '../utils/app_colors.dart';
 import '../view-model/provider.dart';
 
@@ -72,7 +71,7 @@ class HomeView extends StatelessWidget {
                               : _buildFilteredSection(
                                   viewModel.folderContents,
                                   "Other",
-                                  "No other department folders found",
+                                  "\n\n\n Something went wrong, check your internet connection",
                                 ),
                           const SizedBox(height: 30),
                         ],
@@ -168,13 +167,7 @@ class HomeView extends StatelessWidget {
     }).toList();
 
     if (filteredItems.isEmpty) {
-      // Show Lottie animation only for BS Programs (Other)
-      if (filter == "Other") {
-        return _buildEmptyState();
-      } else {
-        return Center(
-            child: Text(emptyMessage)); // Show empty message for MBBS section
-      }
+      return Center(child: _buildEmptyState(emptyMessage));
     }
 
     return filter == "MBBS"
@@ -227,15 +220,15 @@ class HomeView extends StatelessWidget {
                           fit: BoxFit.contain,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: Text(
-                          item['name'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      const SizedBox(height: 14),
+                      Text(
+                        item['name'] ?? 'Unknown',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -248,86 +241,106 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildGridView(List<dynamic> items) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.85,
-        mainAxisSpacing: 20,
-        crossAxisSpacing: 20,
-      ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ResultScreen(
-                  folderId: item['id'],
-                  folderName: item['name'],
-                ),
-              ),
-            );
-          },
-          child: Card(
-            elevation: 8,
-            color: Colors.white,
-            shadowColor: Colors.grey.withOpacity(0.4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Image.asset(
-                    departmentIcon(item),
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    item['name'],
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+  Widget _buildGridView(List<dynamic> folderContents) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
           ),
+          itemCount: folderContents.length,
+          itemBuilder: (context, index) {
+            return _buildFolderItem(folderContents[index], context);
+          },
         );
       },
     );
   }
 
-  Widget _buildEmptyState() {
-    return Column(
-      children: [
-        Lottie.asset(
-            "assets/images/error.json"), // Lottie animation for BS Programs
-        const SizedBox(height: 10),
-        const Text(
-          "Something went wrong",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: Colors.black,
+  Widget _buildEmptyState(String? errorMessage) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            errorMessage ?? 'No files or folders found',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFolderItem(dynamic item, BuildContext context) {
+    bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
+
+    return Card(
+      elevation: 8,
+      color: Colors.white,
+      shadowColor: Colors.grey.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: InkWell(
+        onTap: () {
+          if (isFolder) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultScreen(
+                  folderId: item['id'] ?? '',
+                  folderName: item['name'] ?? 'Unknown Folder',
+                ),
+              ),
+            );
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                departmentIcon(item),
+                width: 50,
+                height: 50,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                item['name'] ?? 'Unknown',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
   String departmentIcon(dynamic item) {
-    return item['name'].toString().toUpperCase().startsWith("MBBS")
-        ? 'assets/icons/mbbs_icon.png'
-        : 'assets/icons/other_icon.png';
+    // Update this function to handle MBBS items and their respective images
+    if (item['name'].contains('MBBS')) {
+      return departments.firstWhere(
+        (dept) => dept['name'] == item['name'],
+        orElse: () => {'icon': 'assets/images/defaultIcon.png'},
+      )['icon']!;
+    }
+    return departments.firstWhere(
+      (dept) => dept['name'] == item['name'],
+      orElse: () => {'icon': 'assets/images/defaultIcon.png'},
+    )['icon']!;
   }
 }
 
