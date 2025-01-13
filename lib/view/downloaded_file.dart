@@ -4,8 +4,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/app_colors.dart';
 
-class DownloadedFilesScreen extends StatelessWidget {
+class DownloadedFilesScreen extends StatefulWidget {
   const DownloadedFilesScreen({super.key});
+
+  @override
+  _DownloadedFilesScreenState createState() => _DownloadedFilesScreenState();
+}
+
+class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
+  Future<List<String>> _getDownloadedFiles() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('downloaded_files') ?? [];
+  }
+
+  Future<void> _deleteFile(String fileMetadata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> files = prefs.getStringList('downloaded_files') ?? [];
+    files.remove(fileMetadata);
+    await prefs.setStringList('downloaded_files', files);
+    setState(() {}); // Update the UI
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,30 +80,48 @@ class DownloadedFilesScreen extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: InkWell(
-                        onTap: () {
-                          OpenFile.open(filePath);
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.book, // Book icon
-                              color: AppColors.themeColor, // Custom color
-                              size: screenWidth * 0.08, // Responsive icon size
+                      child: Stack(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              OpenFile.open(filePath);
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.book, // Book icon
+                                  color: AppColors.themeColor, // Custom color
+                                  size: screenWidth *
+                                      0.08, // Responsive icon size
+                                ),
+                                SizedBox(height: screenWidth * 0.02),
+                                Text(
+                                  fileName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize:
+                                        screenWidth * 0.035, // Responsive font
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
-                            SizedBox(height: screenWidth * 0.02),
-                            Text(
-                              fileName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize:
-                                    screenWidth * 0.035, // Responsive font
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: AppColors.themeColor,
                               ),
-                              textAlign: TextAlign.center,
+                              onPressed: () {
+                                _confirmDelete(context, fileMetadata);
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -98,9 +134,27 @@ class DownloadedFilesScreen extends StatelessWidget {
     );
   }
 
-  Future<List<String>> _getDownloadedFiles() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList('downloaded_files') ?? [];
+  void _confirmDelete(BuildContext context, String fileMetadata) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete File'),
+        content: const Text('Are you sure you want to delete this file?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _deleteFile(fileMetadata);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildNoFilesScreen() {
