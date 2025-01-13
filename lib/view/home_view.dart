@@ -10,13 +10,12 @@ import '../view-model/provider.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeViewModel(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white.withOpacity(0.98),
         drawer: _buildHeader(context),
         body: Consumer<HomeViewModel>(
           builder: (context, viewModel, child) {

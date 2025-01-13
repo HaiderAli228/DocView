@@ -28,7 +28,7 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white.withOpacity(0.98),
       appBar: AppBar(
         backgroundColor: AppColors.themeColor, // Custom theme color
         foregroundColor: Colors.white,
@@ -41,16 +41,12 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(
-                child:
-                    _buildErrorScreen()); // Error state with Lottie animation
+            return Center(child: _buildErrorScreen());
           }
 
           final downloadedFiles = snapshot.data ?? [];
           if (downloadedFiles.isEmpty) {
-            return Center(
-                child:
-                    _buildNoFilesScreen()); // No files state with Lottie animation
+            return Center(child: _buildNoFilesScreen());
           }
 
           return LayoutBuilder(
@@ -64,7 +60,7 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
               return GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
-                  childAspectRatio: 0.8, // Adjust the ratio for a better look
+                  childAspectRatio: 0.92, // Adjust the ratio for a better look
                 ),
                 itemCount: downloadedFiles.length,
                 itemBuilder: (context, index) {
@@ -90,18 +86,16 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.book, // Book icon
-                                  color: AppColors.themeColor, // Custom color
-                                  size: screenWidth *
-                                      0.08, // Responsive icon size
+                                  Icons.book,
+                                  color: AppColors.themeColor,
+                                  size: screenWidth * 0.08,
                                 ),
                                 SizedBox(height: screenWidth * 0.02),
                                 Text(
                                   fileName,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize:
-                                        screenWidth * 0.035, // Responsive font
+                                    fontSize: screenWidth * 0.035,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -111,14 +105,29 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                           Positioned(
                             top: 8,
                             right: 8,
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: AppColors.themeColor,
-                              ),
-                              onPressed: () {
-                                _confirmDelete(context, fileMetadata);
+                            child: PopupMenuButton<String>(
+                              color: Colors.white,
+                              elevation: 5,
+                              shadowColor: Colors.grey,
+                              menuPadding: const EdgeInsets.all(5),
+                              onSelected: (value) {
+                                if (value == 'delete') {
+                                  _confirmDelete(context, fileMetadata);
+                                }
                               },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         ],

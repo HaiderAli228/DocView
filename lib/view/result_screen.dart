@@ -33,7 +33,7 @@ class ResultScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ResultScreenProvider()..initialize(folderId, folderName),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white.withOpacity(0.98),
         appBar: AppBar(
           backgroundColor: AppColors.themeColor,
           foregroundColor: Colors.white,
@@ -65,7 +65,10 @@ class ResultScreen extends StatelessWidget {
             }
             // Show error message if there's an issue
             if (provider.errorMessage != null) {
-              return Center(child: Text(provider.errorMessage!));
+              return Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Center(child: Text(provider.errorMessage!)),
+              );
             }
             // Show a progress animation if no folder contents are available
             if (provider.folderContents.isEmpty) {

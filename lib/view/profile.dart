@@ -11,7 +11,7 @@ class ContactUsScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white.withOpacity(0.98),
       appBar: AppBar(
         backgroundColor: AppColors.themeColor,
         foregroundColor: Colors.white,
