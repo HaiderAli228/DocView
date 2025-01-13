@@ -28,7 +28,7 @@ class HomeView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         const SizedBox(
-                          height: 32,
+                          height: 30,
                         ),
                         _buildHeader(context),
                         RichText(
@@ -56,9 +56,11 @@ class HomeView extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         _buildSectionTitle("Medical Science"),
-                        const SizedBox(height: 10),
                         viewModel.isLoading
-                            ? ShimmerEffect.shimmerEffect()
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: ShimmerEffect.shimmerEffect(),
+                              )
                             : _buildFilteredSection(
                                 viewModel.folderContents,
                                 "MBBS",
@@ -66,9 +68,11 @@ class HomeView extends StatelessWidget {
                               ),
                         const SizedBox(height: 20),
                         _buildSectionTitle("BS Programs"),
-                        const SizedBox(height: 10),
                         viewModel.isLoading
-                            ? ShimmerEffect.shimmerEffect()
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: ShimmerEffect.shimmerEffect(),
+                              )
                             : _buildFilteredSection(
                                 viewModel.folderContents,
                                 "Other",
@@ -279,7 +283,6 @@ class HomeView extends StatelessWidget {
 
   Widget _buildFolderItem(dynamic item, BuildContext context) {
     bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
-
     return Card(
       elevation: 8,
       color: Colors.white,
@@ -301,29 +304,26 @@ class HomeView extends StatelessWidget {
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                departmentIcon(item),
-                width: 50,
-                height: 50,
-                fit: BoxFit.contain,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              departmentIcon(item),
+              width: 50,
+              height: 50,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 14),
+            Text(
+              item['name'] ?? 'Unknown',
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 14),
-              Text(
-                item['name'] ?? 'Unknown',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

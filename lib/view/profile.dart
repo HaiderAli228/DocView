@@ -6,7 +6,6 @@ class ContactUsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen size and scale it for better responsiveness
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -15,11 +14,10 @@ class ContactUsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.themeColor,
         foregroundColor: Colors.white,
-        title: const Text("Library"),
+        title: const Text("About Us"),
       ),
       body: Padding(
-        padding: EdgeInsets.all(
-            screenWidth * 0.04), // Padding scales with screen size
+        padding: EdgeInsets.all(screenWidth * 0.04),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,13 +35,12 @@ class ContactUsScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 10),
-                  Icon(Icons.library_books,
-                      color: AppColors.themeColor, size: 26),
+                  Icon(Icons.school, color: AppColors.themeColor, size: 26),
                 ],
               ),
               const SizedBox(height: 10),
               const Text(
-                "Library is your ultimate educational companion. Designed to help students excel, it offers:",
+                "Library is your one-stop solution for academic excellence. Initially designed for GCUF students, it now serves a broader audience, including MBBS aspirants, offering invaluable resources for every learner.",
                 style: TextStyle(
                   fontSize: 15,
                   fontFamily: "Poppins",
@@ -64,143 +61,87 @@ class ContactUsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "• Access to books and handy notes.",
+                      "Our Features:",
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
                         fontFamily: "Poppins",
                         color: Colors.black87,
                       ),
                     ),
+                    SizedBox(height: 10),
                     Text(
-                      "• Midterm and final past papers.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Access to books, notes, and course outlines.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                     Text(
-                      "• Detailed course outlines.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Past papers and exam strategies for all fields.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                     Text(
-                      "• Important topics and questions.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• MBBS-specific books and essential knowledge.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                     Text(
-                      "• Final year project ideas.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Research ideas and FYP guidance.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                     Text(
-                      "• Department-wise study material.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      "• Semester-wise study guides and exam strategies.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      "• Research topics and ideas for academic exploration.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Personalized resources for university and professional studies.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Divider(
-                color: Colors.grey,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
-              // Vision Section
-              const Text(
-                "Message for you ",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "Poppins",
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 16),
+              // Picture and Quote Section
               Stack(
                 children: [
-                  // Full width image with increased height and rounded corners
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
-                      "assets/images/profile.jpg",
-                      width: double.infinity, // Image takes full width
-                      height: 300, // Increased height of image
+                      "assets/images/profile.jpg", // Replace with your picture
+                      width: double.infinity,
+                      height: 300,
                       fit: BoxFit.cover,
                     ),
                   ),
-                  // Gradient overlay with opacity and quote text
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                            15), // Ensure the gradient overlay follows the image's rounded corners
+                        borderRadius: BorderRadius.circular(15),
                         gradient: LinearGradient(
                           colors: [
-                            Colors.black.withOpacity(0.6),
+                            Colors.black.withOpacity(0.7),
                             Colors.transparent,
                           ],
                           begin: Alignment.bottomCenter,
-                          end: Alignment.topRight,
+                          end: Alignment.topCenter,
                         ),
                       ),
-                      padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.02,
-                          horizontal: screenWidth * 0.05),
                       child: const Align(
                         alignment: Alignment.bottomCenter,
-                        // Do what you can, with what you have, where you are
-                        child: Text(
-                          "\" Don’t let the world define you. Stand out and leave a legacy that can’t be overlooked .\" — Haider Ali ",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Poppins",
-                            color:
-                                Colors.white, // White text on dark background
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text(
+                            "\"Empower your future by embracing knowledge. Excellence is not a destination but a journey.\" — Haider Ali",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Poppins",
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.left,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+
               // Services Section
               Container(
                 padding: EdgeInsets.all(screenWidth * 0.04),
@@ -222,28 +163,16 @@ class ContactUsScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "• Website Development",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Comprehensive academic resources.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                     Text(
-                      "• Personalized project mentorship.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Innovative app and web development.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                     Text(
-                      "• Cutting-edge app development solutions.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: "Poppins",
-                        color: Colors.black87,
-                      ),
+                      "• Research and mentorship programs.",
+                      style: TextStyle(fontSize: 15, fontFamily: "Poppins"),
                     ),
                   ],
                 ),
@@ -303,7 +232,6 @@ class ContactUsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
             ],
           ),
         ),
