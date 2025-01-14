@@ -10,13 +10,20 @@ import '../view-model/provider.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeViewModel(),
       child: Scaffold(
-        backgroundColor: Colors.white.withOpacity(0.98),
-        drawer: _buildHeader(context),
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          title: _buildHeader(context),
+        ),
+        backgroundColor: Colors.white,
         body: Consumer<HomeViewModel>(
           builder: (context, viewModel, child) {
             return Padding(
@@ -27,10 +34,7 @@ class HomeView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        _buildHeader(context),
+                        const SizedBox(height: 10),
                         RichText(
                           text: const TextSpan(
                             style: TextStyle(fontSize: 20),
@@ -54,30 +58,21 @@ class HomeView extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        _buildSectionTitle("Medical Science"),
-                        viewModel.isLoading
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: ShimmerEffect.shimmerEffect(),
-                              )
-                            : _buildFilteredSection(
-                                viewModel.folderContents,
-                                "MBBS",
-                                "",
-                              ),
                         const SizedBox(height: 20),
-                        _buildSectionTitle("BS Programs"),
-                        viewModel.isLoading
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: ShimmerEffect.shimmerEffect(),
-                              )
-                            : _buildFilteredSection(
-                                viewModel.folderContents,
-                                "Other",
-                                "\n\n\n Something went wrong, check your internet connection",
-                              ),
+                        _buildSection(
+                          title: "Medical Science",
+                          viewModel: viewModel,
+                          filter: "MBBS",
+                          emptyMessage: "",
+                        ),
+                        const SizedBox(height: 20),
+                        _buildSection(
+                          title: "BS Programs",
+                          viewModel: viewModel,
+                          filter: "Other",
+                          emptyMessage:
+                              "\n\n\n Something went wrong, check your internet connection",
+                        ),
                         const SizedBox(height: 30),
                       ],
                     ),
@@ -91,6 +86,7 @@ class HomeView extends StatelessWidget {
     );
   }
 
+  // Builds the header with icons for Contact Us and Downloaded Files
   Widget _buildHeader(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -99,69 +95,81 @@ class HomeView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ContactUsScreen(),
-                  ));
-            },
-            child: Container(
-              alignment: Alignment.center,
-              height: screenWidth * 0.12,
-              width: screenWidth * 0.12,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.themeColor.withOpacity(0.13),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Image(
-                image: AssetImage("assets/images/icon.png"),
-                fit: BoxFit.cover,
-              ),
-            ),
+          _buildIconButton(
+            context,
+            screenWidth,
+            "assets/images/icon.png",
+            () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ContactUsScreen())),
           ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DownloadedFilesScreen(),
-                  ));
-            },
-            child: Container(
-                alignment: Alignment.center,
-                height: screenWidth * 0.12,
-                width: screenWidth * 0.12,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.themeColor.withOpacity(0.13),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  FontAwesomeIcons.arrowDown,
-                  color: AppColors.themeColor,
-                )),
+          _buildIconButton(
+            context,
+            screenWidth,
+            FontAwesomeIcons.arrowDown,
+            () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const DownloadedFilesScreen())),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-          fontWeight: FontWeight.w500, fontSize: 20, color: Colors.black),
+  // Builds an icon button with proper styling
+  Widget _buildIconButton(BuildContext context, double screenWidth,
+      dynamic icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        alignment: Alignment.center,
+        height: screenWidth * 0.125,
+        width: screenWidth * 0.125,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.themeColor.withOpacity(0.13),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: icon is String
+            ? Image.asset(icon, fit: BoxFit.cover)
+            : Icon(icon, color: AppColors.themeColor),
+      ),
     );
   }
 
+  // Builds a content section with a title and either a horizontal list or grid view
+  Widget _buildSection({
+    required String title,
+    required HomeViewModel viewModel,
+    required String filter,
+    required String emptyMessage,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: Colors.black,
+          ),
+        ),
+        SizedBox(height: 5,),
+        viewModel.isLoading
+            ? Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: ShimmerEffect.shimmerEffect(),
+              )
+            : _buildFilteredSection(
+                viewModel.folderContents, filter, emptyMessage),
+      ],
+    );
+  }
+
+  // Filters and builds content based on a category
   Widget _buildFilteredSection(
-    List<dynamic> folderContents,
-    String filter,
-    String emptyMessage,
-  ) {
+      List<dynamic> folderContents, String filter, String emptyMessage) {
     final filteredItems = folderContents.where((item) {
       if (filter == "MBBS") {
         return item['name'].toString().toUpperCase().startsWith("MBBS");
@@ -179,46 +187,32 @@ class HomeView extends StatelessWidget {
         : _buildGridView(filteredItems);
   }
 
+  // Builds a horizontal list for MBBS items
   Widget _buildHorizontalList(List<dynamic> items) {
     return SizedBox(
       height: 240,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(
-          top: 10,
-          bottom: 10,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          return Container(
-            margin: const EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultScreen(
-                      folderId: item['id'],
-                      folderName: item['name'],
-                    ),
-                  ),
-                );
-              },
+          return GestureDetector(
+            onTap: () => _navigateToResultScreen(context, item),
+            child: Container(
+              padding: const EdgeInsets.only(right: 10),
               child: Card(
                 elevation: 8,
                 color: Colors.white,
-                shadowColor: Colors.grey.withOpacity(0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
-                        flex: 3,
                         child: Image.asset(
                           departmentIcon(item),
                           fit: BoxFit.contain,
@@ -229,10 +223,8 @@ class HomeView extends StatelessWidget {
                         item['name'] ?? 'Unknown',
                         style: const TextStyle(
                           fontSize: 14,
-                          fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -245,6 +237,7 @@ class HomeView extends StatelessWidget {
     );
   }
 
+  // Builds a grid view for non-MBBS items
   Widget _buildGridView(List<dynamic> folderContents) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -266,44 +259,25 @@ class HomeView extends StatelessWidget {
     );
   }
 
+  // Displays a message if the content is empty
   Widget _buildEmptyState(String? errorMessage) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            errorMessage ?? 'No files or folders found',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
+    return Text(
+      errorMessage ?? 'No files or folders found',
+      style: const TextStyle(fontSize: 16),
+      textAlign: TextAlign.center,
     );
   }
 
+  // Builds a grid item
   Widget _buildFolderItem(dynamic item, BuildContext context) {
-    bool isFolder = item['mimeType'] == 'application/vnd.google-apps.folder';
     return Card(
       elevation: 8,
       color: Colors.white,
-      shadowColor: Colors.grey.withOpacity(0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
       child: InkWell(
-        onTap: () {
-          if (isFolder) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ResultScreen(
-                  folderId: item['id'] ?? '',
-                  folderName: item['name'] ?? 'Unknown Folder',
-                ),
-              ),
-            );
-          }
-        },
+        onTap: () => _navigateToResultScreen(context, item),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -311,17 +285,14 @@ class HomeView extends StatelessWidget {
               departmentIcon(item),
               width: 50,
               height: 50,
-              fit: BoxFit.contain,
             ),
             const SizedBox(height: 14),
             Text(
               item['name'] ?? 'Unknown',
               style: const TextStyle(
                 fontSize: 14,
-                fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -329,14 +300,23 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  String departmentIcon(dynamic item) {
-    // Update this function to handle MBBS items and their respective images
-    if (item['name'].contains('MBBS')) {
-      return departments.firstWhere(
-        (dept) => dept['name'] == item['name'],
-        orElse: () => {'icon': 'assets/images/defaultIcon.png'},
-      )['icon']!;
+  // Handles navigation to the result screen
+  void _navigateToResultScreen(BuildContext context, dynamic item) {
+    if (item['mimeType'] == 'application/vnd.google-apps.folder') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            folderId: item['id'] ?? '',
+            folderName: item['name'] ?? 'Unknown Folder',
+          ),
+        ),
+      );
     }
+  }
+
+  // Retrieves the appropriate icon for a department
+  String departmentIcon(dynamic item) {
     return departments.firstWhere(
       (dept) => dept['name'] == item['name'],
       orElse: () => {'icon': 'assets/images/defaultIcon.png'},

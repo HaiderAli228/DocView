@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:docsview/utils/app_colors.dart';
 
 class PDFViewerScreen extends StatefulWidget {
@@ -21,15 +21,20 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
   bool isLoading = true;
   String? errorMessage;
   bool isDisposed = false;
+  int totalPages = 0;
+  int currentPage = 0;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _loadLastPage();
     _downloadPDF();
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
     isDisposed = true;
   }
@@ -58,10 +63,11 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
 
   Future<http.Response?> _getHttpResponse(String url) async {
     try {
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       return response;
     } catch (_) {
-      return null; // Return null in case of any error (e.g., no internet)
+      return null;
     }
   }
 
@@ -91,6 +97,18 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
     _downloadPDF();
   }
 
+  Future<void> _loadLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentPage = prefs.getInt('lastPage') ?? 0;
+    });
+  }
+
+  Future<void> _saveLastPage(int page) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastPage', page);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,30 +120,53 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
       ),
       body: isLoading
           ? const Center(
-        child: CircularProgressIndicator(
-          color: AppColors.themeColor,
-        ),
-      )
+              child: CircularProgressIndicator(
+                color: AppColors.themeColor,
+              ),
+            )
           : errorMessage != null
-          ? _buildErrorUI()
-          : localPath != null
-          ? PDFView(
-        filePath: localPath!,
-        enableSwipe: true,
-        swipeHorizontal: true,
-        autoSpacing: true,
-        pageFling: true,
-        onError: (error) =>
-            _showErrorSnackBar("Error loading the PDF. Please try again."),
-        onPageError: (page, error) =>
-            _showErrorSnackBar("Error on page $page. Please try again."),
-      )
-          : const Center(
-        child: Text(
-          "Unable to display PDF.",
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
+              ? _buildErrorUI()
+              : localPath != null
+                  ? Column(
+                      children: [
+                        Expanded(
+                          child: PDFView(
+                            filePath: localPath!,
+                            enableSwipe: true,
+                            swipeHorizontal: false,
+                            autoSpacing: true,
+                            pageFling: true,
+                            defaultPage: currentPage,
+                            onError: (error) => _showErrorSnackBar(
+                                "Error loading the PDF. Please try again."),
+                            onPageError: (page, error) => _showErrorSnackBar(
+                                "Error on page $page. Please try again."),
+                            onPageChanged: (page, total) {
+                              if (!isDisposed) {
+                                setState(() {
+                                  currentPage = page!;
+                                  totalPages = total!;
+                                });
+                                _saveLastPage(currentPage);
+                              }
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Page ${currentPage + 1} of $totalPages",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    )
+                  : const Center(
+                      child: Text(
+                        "Unable to display PDF.",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
     );
   }
 

@@ -241,24 +241,26 @@ class ResultScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Container(
-          width: MediaQuery.of(context).size.width *
-              0.42, // Make download button wider
-          padding: const EdgeInsets.symmetric(vertical: 7),
-          margin: const EdgeInsets.symmetric(vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.purple,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          alignment: Alignment.center,
-          child: GestureDetector(
-            onTap: () => downloadFile(fileUrl, fileName, context),
-            child: const Text(
-              'Download',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+        InkWell(
+          onTap: () => downloadFile(fileUrl, fileName, context),
+          child: Container(
+            width: MediaQuery.of(context).size.width *
+                0.42, // Make download button wider
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            margin: const EdgeInsets.symmetric(vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.purple,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            child: GestureDetector(
+              child: const Text(
+                'Download',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -322,6 +324,7 @@ class ResultScreen extends StatelessWidget {
       Fluttertoast.showToast(
           backgroundColor: AppColors.themeColor,
           gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
           textColor: Colors.white,
           msg: "Downloading $fileName...");
 
@@ -336,13 +339,28 @@ class ResultScreen extends StatelessWidget {
         // Store file metadata in SharedPreferences
         await storeFileMetadata(fileName, filePath);
 
-        Fluttertoast.showToast(msg: "$fileName downloaded successfully.");
+        Fluttertoast.showToast(
+            msg: "$fileName downloaded successfully.",
+            gravity: ToastGravity.BOTTOM,
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: AppColors.themeColor,
+            textColor: Colors.white);
         _showOpenFileDialog(context, filePath, fileName);
       } else {
-        Fluttertoast.showToast(msg: "Failed to download $fileName");
+        Fluttertoast.showToast(
+            msg: "Failed to download $fileName",
+            gravity: ToastGravity.BOTTOM,
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error: $e");
+      Fluttertoast.showToast(
+          msg: "Error: $e",
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: AppColors.themeColor,
+          textColor: Colors.white);
     }
   }
 
