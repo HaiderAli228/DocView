@@ -31,7 +31,7 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white.withOpacity(0.98), // Slight opacity for background
+      backgroundColor: Colors.white, // Slight opacity for background
       appBar: AppBar(
         backgroundColor: AppColors.themeColor, // Custom app theme color
         foregroundColor: Colors.white,

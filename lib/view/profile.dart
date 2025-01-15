@@ -55,7 +55,7 @@ class ContactUsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                "Library is your one-stop solution for academic excellence. Initially designed for GCUF students, it now serves a broader audience, including MBBS aspirants, offering invaluable resources for every learner.",
+                "Library is your one-step solution for academic excellence. Initially designed for GCUF students, it now serves a broader audience, including MBBS aspirants, offering invaluable resources for every learner.",
                 style: TextStyle(
                   fontSize: 15,
                   fontFamily: "Poppins",
