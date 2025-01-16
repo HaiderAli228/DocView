@@ -153,6 +153,7 @@ class ResultScreen extends StatelessWidget {
   }
 
   // Helper function to build folder card widget
+
   Widget _buildFolderCard(Map folder) {
     return Card(
       elevation: 8,
