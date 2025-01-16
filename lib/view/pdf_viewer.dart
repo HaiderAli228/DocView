@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:open_file/open_file.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -8,9 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:docsview/utils/app_colors.dart';
 
 class PDFViewerScreen extends StatefulWidget {
-  final String pdfUrl;
+  final String fileUrl;
+  final String fileType; // Add file type to differentiate formats.
 
-  const PDFViewerScreen({super.key, required this.pdfUrl});
+  const PDFViewerScreen(
+      {super.key, required this.fileUrl, required this.fileType});
 
   @override
   PDFViewerScreenState createState() => PDFViewerScreenState();
@@ -29,7 +32,7 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
   void initState() {
     super.initState();
     _loadLastPage();
-    _downloadPDF();
+    _downloadFile();
   }
 
   @override
@@ -39,10 +42,10 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
     isDisposed = true;
   }
 
-  Future<void> _downloadPDF() async {
+  Future<void> _downloadFile() async {
     try {
-      print("Starting download for: ${widget.pdfUrl}");
-      final response = await _getHttpResponse(widget.pdfUrl);
+      print("Starting download for: ${widget.fileUrl}");
+      final response = await _getHttpResponse(widget.fileUrl);
 
       if (response != null && response.statusCode == 200) {
         print("Download successful, saving file...");
@@ -60,7 +63,7 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
       }
     } on TimeoutException {
       _handleError("The request timed out. Please try again.");
-      print("Timeout occurred while downloading the PDF.");
+      print("Timeout occurred while downloading the file.");
     } catch (e) {
       _handleError("Something went wrong. Please try again later.");
       print("Error during download: $e");
@@ -80,7 +83,7 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
 
   Future<String> _saveFileLocally(List<int> bytes) async {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File("${directory.path}/temp.pdf");
+    final file = File("${directory.path}/temp.${widget.fileType}");
     await file.writeAsBytes(bytes);
     return file.path;
   }
@@ -101,7 +104,7 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
         errorMessage = null;
       });
     }
-    _downloadPDF();
+    _downloadFile();
   }
 
   Future<void> _loadLastPage() async {
@@ -116,12 +119,101 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
     await prefs.setInt('lastPage', page);
   }
 
+  Widget _renderFile() {
+    switch (widget.fileType) {
+      case "pdf":
+        return PDFView(
+          filePath: localPath!,
+          enableSwipe: true,
+          swipeHorizontal: false,
+          autoSpacing: true,
+          pageFling: true,
+          defaultPage: currentPage,
+          onError: (error) {
+            _showErrorSnackBar("Error loading the PDF. Please try again.");
+            print("PDFView Error: $error");
+          },
+          onPageError: (page, error) {
+            _showErrorSnackBar("Error on page $page. Please try again.");
+            print("Error on page $page: $error");
+          },
+          onPageChanged: (page, total) {
+            if (!isDisposed) {
+              setState(() {
+                currentPage = page!;
+                totalPages = total!;
+              });
+              _saveLastPage(currentPage);
+            }
+          },
+        );
+
+      case "txt":
+        return FutureBuilder<String>(
+          future: File(localPath!).readAsString(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else {
+              return SingleChildScrollView(
+                controller: _scrollController,
+                child: Text(snapshot.data ?? ""),
+              );
+            }
+          },
+        );
+
+      case "docx":
+      case "pptx":
+        return Center(
+            child: InkWell(
+          onTap: () async {
+            await OpenFile.open(localPath);
+          },
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(6),
+            height: 60,
+            decoration: const BoxDecoration(
+                color: AppColors.themeColor,
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            width: 200,
+            child: const Text(
+              "Click to Open File ",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ));
+
+      case "png":
+      case "jpg":
+      case "jpeg":
+        return Center(
+          child: Image.file(
+            File(localPath!),
+            fit: BoxFit.contain,
+          ),
+        );
+
+      default:
+        return const Center(
+          child: Text(
+            "Unsupported file format.",
+            style: TextStyle(fontSize: 16),
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("PDF Viewer"),
+        title: const Text("File Viewer"),
         backgroundColor: AppColors.themeColor,
         foregroundColor: Colors.white,
       ),
@@ -155,49 +247,10 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
           : errorMessage != null
               ? _buildErrorUI()
               : localPath != null
-                  ? Column(
-                      children: [
-                        Expanded(
-                          child: PDFView(
-                            filePath: localPath!,
-                            enableSwipe: true,
-                            swipeHorizontal: false,
-                            autoSpacing: true,
-                            pageFling: true,
-                            defaultPage: currentPage,
-                            onError: (error) {
-                              _showErrorSnackBar(
-                                  "Error loading the PDF. Please try again.");
-                              print("PDFView Error: $error");
-                            },
-                            onPageError: (page, error) {
-                              _showErrorSnackBar(
-                                  "Error on page $page. Please try again.");
-                              print("Error on page $page: $error");
-                            },
-                            onPageChanged: (page, total) {
-                              if (!isDisposed) {
-                                setState(() {
-                                  currentPage = page!;
-                                  totalPages = total!;
-                                });
-                                _saveLastPage(currentPage);
-                              }
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "Page ${currentPage + 1} of $totalPages",
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ],
-                    )
+                  ? _renderFile()
                   : const Center(
                       child: Text(
-                        "Unable to display PDF.",
+                        "Unable to display file.",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),

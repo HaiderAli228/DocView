@@ -236,16 +236,17 @@ class ResultScreen extends StatelessWidget {
   }
 
   // Helper function to build file action buttons (Download, View)
-  Widget _buildFileActions(
-      String fileUrl, String fileName, BuildContext context) {
+  Widget _buildFileActions(String fileUrl, String fileName, BuildContext context) {
+    // Derive fileType from fileName or MIME type
+    String fileType = fileName.split('.').last.toLowerCase(); // Extract extension
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         InkWell(
           onTap: () => downloadFile(fileUrl, fileName, context),
           child: Container(
-            width: MediaQuery.of(context).size.width *
-                0.42, // Make download button wider
+            width: MediaQuery.of(context).size.width * 0.42, // Make download button wider
             padding: const EdgeInsets.symmetric(vertical: 7),
             margin: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
@@ -253,22 +254,19 @@ class ResultScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,
-            child: GestureDetector(
-              child: const Text(
-                'Download',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+            child: const Text(
+              'Download',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
         const SizedBox(width: 8), // Add some space between the buttons
         Container(
-          width: MediaQuery.of(context).size.width *
-              0.2, // Make view button smaller
+          width: MediaQuery.of(context).size.width * 0.2, // Make view button smaller
           padding: const EdgeInsets.symmetric(vertical: 7),
           margin: const EdgeInsets.symmetric(vertical: 5),
           decoration: BoxDecoration(
@@ -281,7 +279,7 @@ class ResultScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PDFViewerScreen(pdfUrl: fileUrl),
+                  builder: (context) => PDFViewerScreen(fileUrl: fileUrl, fileType: fileType),
                 ),
               );
             },
@@ -298,6 +296,7 @@ class ResultScreen extends StatelessWidget {
       ],
     );
   }
+
 
   // Helper function to get appropriate department icon based on mimeType
   String getDepartmentIcon(String mimeType) {
@@ -365,35 +364,33 @@ class ResultScreen extends StatelessWidget {
   }
 
 // Function to show the dialog asking if the user wants to open the file
+  // Function to show a dialog prompting the user to open the downloaded file
   void _showOpenFileDialog(
       BuildContext context, String filePath, String fileName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
-          elevation: 6,
-          iconColor: AppColors.themeColor,
-          title: const Text("Download Complete"),
-          content: Text("Do you want to open the file '$fileName'?"),
+          title: const Text('Download Complete'),
+          content: Text('$fileName has been downloaded. Do you want to open it?'),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
+                Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text("No"),
+              child: const Text('Cancel'),
             ),
-            TextButton(
+            ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
-                // Open the file if the user pressed "Yes"
-                OpenFile.open(filePath);
+                Navigator.of(context).pop(); // Close the dialog
+                OpenFile.open(filePath); // Open the downloaded file
               },
-              child: const Text("Yes"),
+              child: const Text('Open'),
             ),
           ],
         );
       },
     );
   }
+
 }
