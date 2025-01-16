@@ -41,10 +41,13 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
 
   Future<void> _downloadPDF() async {
     try {
+      print("Starting download for: ${widget.pdfUrl}");
       final response = await _getHttpResponse(widget.pdfUrl);
 
       if (response != null && response.statusCode == 200) {
+        print("Download successful, saving file...");
         final filePath = await _saveFileLocally(response.bodyBytes);
+        print("File saved locally at: $filePath");
         if (!isDisposed) {
           setState(() {
             localPath = filePath;
@@ -53,20 +56,24 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
         }
       } else {
         _handleError("Unable to download the file.");
+        print("Download failed. HTTP status code: ${response?.statusCode}");
       }
     } on TimeoutException {
       _handleError("The request timed out. Please try again.");
+      print("Timeout occurred while downloading the PDF.");
     } catch (e) {
       _handleError("Something went wrong. Please try again later.");
+      print("Error during download: $e");
     }
   }
 
   Future<http.Response?> _getHttpResponse(String url) async {
     try {
-      final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
-      return response;
-    } catch (_) {
+      return await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 80));
+    } catch (e) {
+      print("Error in HTTP request: $e");
       return null;
     }
   }
@@ -120,8 +127,29 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
       ),
       body: isLoading
           ? const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.themeColor,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: AppColors.themeColor,
+                  ),
+                  SizedBox(
+                    height: 22,
+                  ),
+                  Text("Large file take time, please wait while loading"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Recommended :  ",
+                        style: TextStyle(
+                            color: AppColors.themeColor,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text("First download, then see"),
+                    ],
+                  )
+                ],
               ),
             )
           : errorMessage != null
@@ -137,10 +165,16 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
                             autoSpacing: true,
                             pageFling: true,
                             defaultPage: currentPage,
-                            onError: (error) => _showErrorSnackBar(
-                                "Error loading the PDF. Please try again."),
-                            onPageError: (page, error) => _showErrorSnackBar(
-                                "Error on page $page. Please try again."),
+                            onError: (error) {
+                              _showErrorSnackBar(
+                                  "Error loading the PDF. Please try again.");
+                              print("PDFView Error: $error");
+                            },
+                            onPageError: (page, error) {
+                              _showErrorSnackBar(
+                                  "Error on page $page. Please try again.");
+                              print("Error on page $page: $error");
+                            },
                             onPageChanged: (page, total) {
                               if (!isDisposed) {
                                 setState(() {
