@@ -155,7 +155,9 @@ class HomeView extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        SizedBox(height: 5,),
+        SizedBox(
+          height: 5,
+        ),
         viewModel.isLoading
             ? Padding(
                 padding: const EdgeInsets.only(top: 10),

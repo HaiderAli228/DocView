@@ -44,13 +44,10 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
 
   Future<void> _downloadFile() async {
     try {
-      print("Starting download for: ${widget.fileUrl}");
       final response = await _getHttpResponse(widget.fileUrl);
 
       if (response != null && response.statusCode == 200) {
-        print("Download successful, saving file...");
         final filePath = await _saveFileLocally(response.bodyBytes);
-        print("File saved locally at: $filePath");
         if (!isDisposed) {
           setState(() {
             localPath = filePath;
@@ -59,14 +56,11 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
         }
       } else {
         _handleError("Unable to download the file.");
-        print("Download failed. HTTP status code: ${response?.statusCode}");
       }
     } on TimeoutException {
       _handleError("The request timed out. Please try again.");
-      print("Timeout occurred while downloading the file.");
     } catch (e) {
       _handleError("Something went wrong. Please try again later.");
-      print("Error during download: $e");
     }
   }
 
@@ -76,7 +70,6 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
           .get(Uri.parse(url))
           .timeout(const Duration(seconds: 80));
     } catch (e) {
-      print("Error in HTTP request: $e");
       return null;
     }
   }
@@ -131,11 +124,9 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
           defaultPage: currentPage,
           onError: (error) {
             _showErrorSnackBar("Error loading the PDF. Please try again.");
-            print("PDFView Error: $error");
           },
           onPageError: (page, error) {
             _showErrorSnackBar("Error on page $page. Please try again.");
-            print("Error on page $page: $error");
           },
           onPageChanged: (page, total) {
             if (!isDisposed) {
