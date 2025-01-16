@@ -223,7 +223,7 @@ class ContactUsScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "The Library app is a testament to what leadership, creativity, and dedication can achieve. Led and developed by Haider Ali, with the support of TechSquad, this app reflects the hard work and passion of every individual involved. Every feature and design element is crafted with the aim of providing an exceptional experience for users. We hope our journey inspires you to pursue your dreams and make a positive impact.",
+                      "The Library app is a testament to what leadership, creativity, and dedication can achieve. Lead and developed by Haider Ali, with the support of TechSquad, this app reflects the hard work and passion of every individual involved. Every feature and design element is crafted with the aim of providing an exceptional experience for users. We hope our journey inspires you to pursue your dreams and make a positive impact.",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
