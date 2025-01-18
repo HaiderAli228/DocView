@@ -17,17 +17,18 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
   Future<List<String>> _getDownloadedFiles() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> files = prefs.getStringList('downloaded_files') ?? [];
-    files = files.reversed.toList(); // Reverse the list to show the last downloaded file first
+    files = files.reversed
+        .toList(); // Reverse the list to show the last downloaded file first
     return files;
   }
-
 
   // Delete a specific file from SharedPreferences and update UI
   Future<void> _deleteFile(String fileMetadata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> files = prefs.getStringList('downloaded_files') ?? [];
     files.remove(fileMetadata); // Remove the file from the list
-    await prefs.setStringList('downloaded_files', files); // Save the updated list back to prefs
+    await prefs.setStringList(
+        'downloaded_files', files); // Save the updated list back to prefs
     setState(() {}); // Trigger UI update
   }
 
@@ -44,15 +45,18 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
         future: _getDownloadedFiles(), // Fetch the downloaded files list
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator()); // Show loading indicator
+            return const Center(
+                child: CircularProgressIndicator()); // Show loading indicator
           }
           if (snapshot.hasError) {
-            return Center(child: _buildErrorScreen()); // Show error screen on failure
+            return Center(
+                child: _buildErrorScreen()); // Show error screen on failure
           }
 
           final downloadedFiles = snapshot.data ?? [];
           if (downloadedFiles.isEmpty) {
-            return Center(child: _buildNoFilesScreen()); // Show 'No files' screen
+            return Center(
+                child: _buildNoFilesScreen()); // Show 'No files' screen
           }
 
           return LayoutBuilder(
@@ -60,17 +64,20 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
               double screenWidth = constraints.maxWidth;
 
               // Calculate the number of grid items per row based on screen width
-              int crossAxisCount = (screenWidth ~/ 180).clamp(2, 4); // Min 2, max 4 items per row
+              int crossAxisCount = (screenWidth ~/ 180)
+                  .clamp(2, 4); // Min 2, max 4 items per row
 
               return GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
-                  childAspectRatio: 0.92, // Adjust aspect ratio for a clean look
+                  childAspectRatio:
+                      0.92, // Adjust aspect ratio for a clean look
                 ),
                 itemCount: downloadedFiles.length,
                 itemBuilder: (context, index) {
                   final fileMetadata = downloadedFiles[index];
-                  final fileParts = fileMetadata.split(':'); // Split metadata for file details
+                  final fileParts = fileMetadata
+                      .split(':'); // Split metadata for file details
                   final fileName = fileParts[0];
                   final filePath = fileParts[1];
 
@@ -80,7 +87,8 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                       color: Colors.white,
                       elevation: 5, // Card shadow for depth
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10), // Rounded corners for card
+                        borderRadius: BorderRadius.circular(
+                            10), // Rounded corners for card
                       ),
                       child: Stack(
                         children: [
@@ -95,14 +103,16 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                                   Icon(
                                     Icons.book, // Icon for file preview
                                     color: AppColors.themeColor,
-                                    size: screenWidth * 0.08, // Adjust size dynamically
+                                    size: screenWidth *
+                                        0.08, // Adjust size dynamically
                                   ),
                                   SizedBox(height: screenWidth * 0.02),
                                   Text(
                                     fileName,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: screenWidth * 0.035, // Dynamic text size
+                                      fontSize: screenWidth *
+                                          0.035, // Dynamic text size
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -121,7 +131,8 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                               menuPadding: const EdgeInsets.all(5),
                               onSelected: (value) {
                                 if (value == 'delete') {
-                                  _confirmDelete(context, fileMetadata); // Confirm before deleting
+                                  _confirmDelete(context,
+                                      fileMetadata); // Confirm before deleting
                                 }
                               },
                               itemBuilder: (context) => [
@@ -182,7 +193,7 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
 
   // Widget for 'No files' message
   Widget _buildNoFilesScreen() {
-    return  SingleChildScrollView(
+    return SingleChildScrollView(
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

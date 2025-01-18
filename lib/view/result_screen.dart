@@ -112,7 +112,7 @@ class ResultScreen extends StatelessWidget {
                             MediaQuery.of(context).size.width > 600 ? 4 : 2,
                         crossAxisSpacing: 17,
                         mainAxisSpacing: 17,
-                        childAspectRatio: 1,
+                        childAspectRatio: 0.9,
                       ),
                       itemCount: folders.length,
                       itemBuilder: (context, index) {
@@ -176,12 +176,12 @@ class ResultScreen extends StatelessWidget {
             Text(
               folder['name'] ?? 'Unknown',
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
-              maxLines: 2,
+              maxLines: 3,
             ),
           ],
         ),
@@ -219,7 +219,7 @@ class ResultScreen extends StatelessWidget {
                   Text(
                     file['name'] ?? 'Unknown File',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -394,8 +394,13 @@ class ResultScreen extends StatelessWidget {
                 Navigator.of(context).pop(); // Close the dialog
                 OpenFile.open(filePath); // Open the downloaded file
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.themeColor, // Set background color to purple
+                foregroundColor: Colors.white,  // Set text color to white
+              ),
               child: const Text('Open'),
             ),
+
           ],
         );
       },
