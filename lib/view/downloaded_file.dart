@@ -16,8 +16,11 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
   // Fetch the list of downloaded files from SharedPreferences
   Future<List<String>> _getDownloadedFiles() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList('downloaded_files') ?? []; // Return empty list if none
+    List<String> files = prefs.getStringList('downloaded_files') ?? [];
+    files = files.reversed.toList(); // Reverse the list to show the last downloaded file first
+    return files;
   }
+
 
   // Delete a specific file from SharedPreferences and update UI
   Future<void> _deleteFile(String fileMetadata) async {
@@ -85,24 +88,26 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                             onTap: () {
                               OpenFile.open(filePath); // Open file on tap
                             },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.book, // Icon for file preview
-                                  color: AppColors.themeColor,
-                                  size: screenWidth * 0.08, // Adjust size dynamically
-                                ),
-                                SizedBox(height: screenWidth * 0.02),
-                                Text(
-                                  fileName,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.035, // Dynamic text size
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.book, // Icon for file preview
+                                    color: AppColors.themeColor,
+                                    size: screenWidth * 0.08, // Adjust size dynamically
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                                  SizedBox(height: screenWidth * 0.02),
+                                  Text(
+                                    fileName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenWidth * 0.035, // Dynamic text size
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           // Popup menu for file actions (e.g., delete)
