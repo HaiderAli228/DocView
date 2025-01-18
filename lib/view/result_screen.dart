@@ -237,9 +237,11 @@ class ResultScreen extends StatelessWidget {
   }
 
   // Helper function to build file action buttons (Download, View)
-  Widget _buildFileActions(String fileUrl, String fileName, BuildContext context) {
+  Widget _buildFileActions(
+      String fileUrl, String fileName, BuildContext context) {
     // Derive fileType from fileName or MIME type
-    String fileType = fileName.split('.').last.toLowerCase(); // Extract extension
+    String fileType =
+        fileName.split('.').last.toLowerCase(); // Extract extension
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -247,7 +249,8 @@ class ResultScreen extends StatelessWidget {
         InkWell(
           onTap: () => downloadFile(fileUrl, fileName, context),
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.42, // Make download button wider
+            width: MediaQuery.of(context).size.width *
+                0.42, // Make download button wider
             padding: const EdgeInsets.symmetric(vertical: 7),
             margin: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
@@ -267,7 +270,8 @@ class ResultScreen extends StatelessWidget {
         ),
         const SizedBox(width: 8), // Add some space between the buttons
         Container(
-          width: MediaQuery.of(context).size.width * 0.2, // Make view button smaller
+          width: MediaQuery.of(context).size.width *
+              0.2, // Make view button smaller
           padding: const EdgeInsets.symmetric(vertical: 7),
           margin: const EdgeInsets.symmetric(vertical: 5),
           decoration: BoxDecoration(
@@ -280,7 +284,8 @@ class ResultScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PDFViewerScreen(fileUrl: fileUrl, fileType: fileType),
+                  builder: (context) =>
+                      PDFViewerScreen(fileUrl: fileUrl, fileType: fileType),
                 ),
               );
             },
@@ -297,7 +302,6 @@ class ResultScreen extends StatelessWidget {
       ],
     );
   }
-
 
   // Helper function to get appropriate department icon based on mimeType
   String getDepartmentIcon(String mimeType) {
@@ -372,8 +376,12 @@ class ResultScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
+          iconColor: AppColors.themeColor,
+          shadowColor: Colors.grey,
           title: const Text('Download Complete'),
-          content: Text('$fileName has been downloaded. Do you want to open it?'),
+          content:
+              Text('$fileName has been downloaded. Do you want to open it?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -393,5 +401,4 @@ class ResultScreen extends StatelessWidget {
       },
     );
   }
-
 }

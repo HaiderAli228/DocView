@@ -160,6 +160,7 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
         title: const Text('Delete File'),
         backgroundColor: Colors.white,
         elevation: 8,
+        surfaceTintColor: Colors.white,
         shadowColor: Colors.grey,
         content: const Text('Are you sure you want to delete this file?'),
         actions: [
