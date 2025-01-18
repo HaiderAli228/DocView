@@ -95,14 +95,14 @@ class HomeView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildIconButton(
+          buildIconButton(
             context,
             screenWidth,
             "assets/images/icon.png",
             () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const ContactUsScreen())),
           ),
-          _buildIconButton(
+          buildIconButton(
             context,
             screenWidth,
             FontAwesomeIcons.arrowDown,
@@ -117,7 +117,7 @@ class HomeView extends StatelessWidget {
   }
 
   // Builds an icon button with proper styling
-  Widget _buildIconButton(BuildContext context, double screenWidth,
+  static Widget buildIconButton(BuildContext context, double screenWidth,
       dynamic icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,

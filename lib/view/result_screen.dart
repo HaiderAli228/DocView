@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:badges/badges.dart' as badges;
+import 'package:badges/badges.dart';
 import 'package:docsview/view/pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,7 +16,10 @@ import '../utils/shimmer_widget.dart';
 import '../view-model/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ResultScreen extends StatelessWidget {
+import 'downloaded_file.dart';
+import 'home_view.dart';
+
+class ResultScreen extends StatefulWidget {
   final String folderId;
   final String folderName;
 
@@ -23,6 +29,11 @@ class ResultScreen extends StatelessWidget {
     required this.folderName,
   });
 
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
   // Generate file URL to fetch file from Google Drive API
   String generateFileUrl(String fileId, String apiKey) {
     return "https://www.googleapis.com/drive/v3/files/$fileId?alt=media&key=$apiKey";
@@ -30,15 +41,20 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return ChangeNotifierProvider(
-      create: (_) => ResultScreenProvider()..initialize(folderId, folderName),
+      create: (_) => ResultScreenProvider()
+        ..initialize(widget.folderId, widget.folderName),
       child: Scaffold(
         backgroundColor: Colors.white.withOpacity(0.98),
         appBar: AppBar(
           backgroundColor: AppColors.themeColor,
           foregroundColor: Colors.white,
           title: Consumer<ResultScreenProvider>(
-            builder: (context, provider, _) => Text(provider.currentFolderName),
+            builder: (context, provider, _) => Text(
+              provider.currentFolderName,
+              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+            ),
           ),
           leading: Consumer<ResultScreenProvider>(
             builder: (context, provider, _) => IconButton(
@@ -53,6 +69,46 @@ class ResultScreen extends StatelessWidget {
               },
             ),
           ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Consumer<ResultScreenProvider>(
+                builder: (context, provider, _) => badges.Badge(
+                  position: BadgePosition.topEnd(top: 0, end: 0),
+                  badgeContent: provider.activeDownloads > 0
+                      ? Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Text(
+                            '${provider.activeDownloads}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                        )
+                      : null,
+                  badgeStyle: BadgeStyle(
+                    badgeColor: provider.isDownloading
+                        ? Colors.transparent
+                        : AppColors.themeColor,
+                    shape: BadgeShape.circle,
+                  ),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: screenWidth * 0.101,
+                    width: screenWidth * 0.101,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.13),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      FontAwesomeIcons.arrowDown,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         body: Consumer<ResultScreenProvider>(
           builder: (context, provider, _) {
@@ -153,7 +209,6 @@ class ResultScreen extends StatelessWidget {
   }
 
   // Helper function to build folder card widget
-
   Widget _buildFolderCard(Map folder) {
     return Card(
       elevation: 8,
@@ -247,7 +302,9 @@ class ResultScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         InkWell(
-          onTap: () => downloadFile(fileUrl, fileName, context),
+          onTap: () {
+            downloadFile(fileUrl, fileName, context);
+          },
           child: Container(
             width: MediaQuery.of(context).size.width *
                 0.42, // Make download button wider
@@ -325,6 +382,9 @@ class ResultScreen extends StatelessWidget {
   Future<void> downloadFile(
       String url, String fileName, BuildContext context) async {
     try {
+      final provider =
+          Provider.of<ResultScreenProvider>(context, listen: false);
+      provider.incrementDownload();
       Fluttertoast.showToast(
           backgroundColor: AppColors.themeColor,
           gravity: ToastGravity.CENTER,
@@ -349,6 +409,7 @@ class ResultScreen extends StatelessWidget {
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: AppColors.themeColor,
             textColor: Colors.white);
+
         _showOpenFileDialog(context, filePath, fileName);
       } else {
         Fluttertoast.showToast(
@@ -365,11 +426,14 @@ class ResultScreen extends StatelessWidget {
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: AppColors.themeColor,
           textColor: Colors.white);
+    } finally {
+      final provider =
+          Provider.of<ResultScreenProvider>(context, listen: false);
+      provider.decrementDownload();
     }
   }
 
 // Function to show the dialog asking if the user wants to open the file
-  // Function to show a dialog prompting the user to open the downloaded file
   void _showOpenFileDialog(
       BuildContext context, String filePath, String fileName) {
     showDialog(
@@ -395,12 +459,12 @@ class ResultScreen extends StatelessWidget {
                 OpenFile.open(filePath); // Open the downloaded file
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.themeColor, // Set background color to purple
-                foregroundColor: Colors.white,  // Set text color to white
+                backgroundColor:
+                    AppColors.themeColor, // Set background color to purple
+                foregroundColor: Colors.white, // Set text color to white
               ),
               child: const Text('Open'),
             ),
-
           ],
         );
       },

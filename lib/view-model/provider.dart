@@ -25,17 +25,20 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> fetchFolderContents(String folderId) async {
     _setLoadingState(true);
 
-    final String url = "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+    final String url =
+        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
 
     try {
       final response = await _makeApiCall(url);
       if (response != null && response.statusCode == 200) {
         _processFolderData(response.body);
       } else {
-        _handleError('Something went wrong while fetching the data. Please try again later.');
+        _handleError(
+            'Something went wrong while fetching the data. Please try again later.');
       }
     } catch (e) {
-      _handleError('An error occurred. Please check your internet connection or try again later.');
+      _handleError(
+          'An error occurred. Please check your internet connection or try again later.');
     }
   }
 
@@ -47,11 +50,14 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<http.Response?> _makeApiCall(String url) async {
     try {
-      return await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
+      return await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 20));
     } on TimeoutException {
       _handleError('The request timed out. Please try again later.');
     } on SocketException {
-      _handleError('No internet connection. Please check your network settings.');
+      _handleError(
+          'No internet connection. Please check your network settings.');
     } catch (_) {
       _handleError('An unexpected error occurred. Please try again later.');
     }
@@ -63,7 +69,8 @@ class HomeViewModel extends ChangeNotifier {
     folderContents = data['files'] ?? [];
 
     // Sort folder contents by name (case-insensitive)
-    folderContents.sort((a, b) => (a['name']?.toLowerCase() ?? '').compareTo(b['name']?.toLowerCase() ?? ''));
+    folderContents.sort((a, b) => (a['name']?.toLowerCase() ?? '')
+        .compareTo(b['name']?.toLowerCase() ?? ''));
     _setLoadingState(false);
   }
 
@@ -100,27 +107,33 @@ class ResultScreenProvider extends ChangeNotifier {
     errorMessage = null;
 
     final String apiKey = dotenv.env['API_KEY'] ?? '';
-    final String url = "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
+    final String url =
+        "https://www.googleapis.com/drive/v3/files?q='$folderId'+in+parents+and+trashed=false&key=$apiKey&fields=files(id,name,mimeType)";
 
     try {
       final response = await _makeApiCall(url);
       if (response != null && response.statusCode == 200) {
         _processFolderData(response.body);
       } else {
-        _handleError('Something went wrong while fetching the data. Please try again later.');
+        _handleError(
+            'Something went wrong while fetching the data. Please try again later.');
       }
     } catch (e) {
-      _handleError('An error occurred. Please check your internet connection or try again later.');
+      _handleError(
+          'An error occurred. Please check your internet connection or try again later.');
     }
   }
 
   Future<http.Response?> _makeApiCall(String url) async {
     try {
-      return await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
+      return await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 20));
     } on TimeoutException {
       _handleError('The request timed out. Please try again later.');
     } on SocketException {
-      _handleError('No internet connection. Please check your network settings.');
+      _handleError(
+          'No internet connection. Please check your network settings.');
     } catch (_) {
       _handleError('An unexpected error occurred. Please try again later.');
     }
@@ -132,7 +145,8 @@ class ResultScreenProvider extends ChangeNotifier {
     folderContents = data['files'] ?? [];
 
     // Sort folder contents by name (case-insensitive)
-    folderContents.sort((a, b) => (a['name']?.toLowerCase() ?? '').compareTo(b['name']?.toLowerCase() ?? ''));
+    folderContents.sort((a, b) => (a['name']?.toLowerCase() ?? '')
+        .compareTo(b['name']?.toLowerCase() ?? ''));
     _setLoadingState(false);
   }
 
@@ -162,6 +176,24 @@ class ResultScreenProvider extends ChangeNotifier {
       currentFolderId = previousFolder['id']!;
       currentFolderName = previousFolder['name']!;
       fetchFolderContents(currentFolderId);
+    }
+  }
+
+  int _activeDownloads = 0;
+  bool isDownloading = true;
+  int get activeDownloads => _activeDownloads;
+
+  void incrementDownload() {
+    _activeDownloads++;
+    isDownloading = false;
+    notifyListeners();
+  }
+
+  void decrementDownload() {
+    if (_activeDownloads > 0) {
+      _activeDownloads--;
+      isDownloading = true;
+      notifyListeners();
     }
   }
 }
