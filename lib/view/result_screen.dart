@@ -17,7 +17,6 @@ import '../view-model/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'downloaded_file.dart';
-import 'home_view.dart';
 
 class ResultScreen extends StatefulWidget {
   final String folderId;
@@ -70,39 +69,48 @@ class _ResultScreenState extends State<ResultScreen> {
             ),
           ),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Consumer<ResultScreenProvider>(
-                builder: (context, provider, _) => badges.Badge(
-                  position: BadgePosition.topEnd(top: 0, end: 0),
-                  badgeContent: provider.activeDownloads > 0
-                      ? Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Text(
-                            '${provider.activeDownloads}',
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
-                          ),
-                        )
-                      : null,
-                  badgeStyle: BadgeStyle(
-                    badgeColor: provider.isDownloading
-                        ? Colors.transparent
-                        : AppColors.themeColor,
-                    shape: BadgeShape.circle,
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: screenWidth * 0.101,
-                    width: screenWidth * 0.101,
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.13),
-                      borderRadius: BorderRadius.circular(10),
+            InkWell(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const DownloadedFilesScreen())),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Consumer<ResultScreenProvider>(
+                  builder: (context, provider, _) => badges.Badge(
+                    position: BadgePosition.bottomEnd(
+                      bottom: 15,
+                      end: -10,
                     ),
-                    child: const Icon(
-                      FontAwesomeIcons.arrowDown,
-                      size: 20,
+                    badgeContent: provider.activeDownloads > 0
+                        ? Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: Text(
+                              '${provider.activeDownloads}',
+                              style: const TextStyle(
+                                  color: AppColors.themeColor, fontSize: 12),
+                            ),
+                          )
+                        : null,
+                    badgeStyle: BadgeStyle(
+                      badgeColor: provider.isDownloading
+                          ? Colors.transparent
+                          : Colors.white,
+                      shape: BadgeShape.circle,
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: screenWidth * 0.09,
+                      width: screenWidth * 0.09,
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.16),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        FontAwesomeIcons.arrowDown,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -387,8 +395,8 @@ class _ResultScreenState extends State<ResultScreen> {
       provider.incrementDownload();
       Fluttertoast.showToast(
           backgroundColor: AppColors.themeColor,
-          gravity: ToastGravity.CENTER,
-          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          toastLength: Toast.LENGTH_SHORT,
           textColor: Colors.white,
           msg: "Downloading $fileName...");
 
