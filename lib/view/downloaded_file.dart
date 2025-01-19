@@ -1,3 +1,4 @@
+import 'package:docsview/view/result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:open_file/open_file.dart';
@@ -39,7 +40,10 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.themeColor, // Custom app theme color
         foregroundColor: Colors.white,
-        title: const Text('Downloaded Files'),
+        title: const Text('Downloaded Files',
+          style:  TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        titleSpacing: 0,
       ),
       body: FutureBuilder<List<String>>(
         future: _getDownloadedFiles(), // Fetch the downloaded files list
@@ -107,14 +111,18 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                                         0.08, // Adjust size dynamically
                                   ),
                                   SizedBox(height: screenWidth * 0.02),
-                                  Text(
-                                    fileName,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: screenWidth *
-                                          0.035, // Dynamic text size
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Text(
+                                      fileName,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: screenWidth *
+                                            0.035, // Dynamic text size
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
                                 ],
                               ),
@@ -177,9 +185,9 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: ResultScreenState.buttonText("Cancel"),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.of(ctx).pop();
               _deleteFile(fileMetadata); // Perform deletion

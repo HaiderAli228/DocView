@@ -29,7 +29,11 @@ class ContactUsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.themeColor,
         foregroundColor: Colors.white,
-        title: const Text("Library"),
+        title: const Text(
+          "Library",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        titleSpacing: 0,
       ),
       body: Padding(
         padding: EdgeInsets.all(screenWidth * 0.04),

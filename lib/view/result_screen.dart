@@ -29,13 +29,23 @@ class ResultScreen extends StatefulWidget {
   });
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState();
+  State<ResultScreen> createState() => ResultScreenState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class ResultScreenState extends State<ResultScreen> {
   // Generate file URL to fetch file from Google Drive API
   String generateFileUrl(String fileId, String apiKey) {
     return "https://www.googleapis.com/drive/v3/files/$fileId?alt=media&key=$apiKey";
+  }
+
+  static Widget buttonText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Colors.purple,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 
   @override
@@ -49,10 +59,11 @@ class _ResultScreenState extends State<ResultScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.themeColor,
           foregroundColor: Colors.white,
+          titleSpacing: 0,
           title: Consumer<ResultScreenProvider>(
             builder: (context, provider, _) => Text(
               provider.currentFolderName,
-              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           leading: Consumer<ResultScreenProvider>(
@@ -390,6 +401,53 @@ class _ResultScreenState extends State<ResultScreen> {
   Future<void> downloadFile(
       String url, String fileName, BuildContext context) async {
     try {
+      // Determine the directory to save the file
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/$fileName';
+      final file = File(filePath);
+
+      // Check if the file already exists
+      if (file.existsSync()) {
+        // Show confirmation dialog
+        final shouldDownloadAgain = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            shadowColor: Colors.grey,
+            title: const Text("File Already Exists"),
+            content: const Text(
+                "The file is already downloaded. Do you want to download it again?"),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: buttonText("Cancel")),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: buttonText("Again download"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DownloadedFilesScreen(),
+                    )),
+                child: buttonText("Goto download page"),
+              ),
+            ],
+          ),
+        );
+
+        // If the user cancels, exit the function
+        if (shouldDownloadAgain == null || !shouldDownloadAgain) {
+          Fluttertoast.showToast(
+            msg: "Download cancelled",
+            backgroundColor: Colors.purple,
+          );
+          return;
+        }
+      }
+
       final provider =
           Provider.of<ResultScreenProvider>(context, listen: false);
       provider.incrementDownload();
@@ -402,15 +460,11 @@ class _ResultScreenState extends State<ResultScreen> {
 
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        final directory = await getApplicationDocumentsDirectory();
-        final filePath = '${directory.path}/$fileName';
-
-        final file = File(filePath);
+        // Writing the file to the device
         await file.writeAsBytes(response.bodyBytes);
 
         // Store file metadata in SharedPreferences
         await storeFileMetadata(fileName, filePath);
-
         Fluttertoast.showToast(
             msg: "$fileName downloaded successfully.",
             gravity: ToastGravity.BOTTOM,
@@ -428,12 +482,6 @@ class _ResultScreenState extends State<ResultScreen> {
             textColor: Colors.white);
       }
     } catch (e) {
-      Fluttertoast.showToast(
-          msg: "Error: $e",
-          gravity: ToastGravity.CENTER,
-          toastLength: Toast.LENGTH_SHORT,
-          backgroundColor: AppColors.themeColor,
-          textColor: Colors.white);
     } finally {
       final provider =
           Provider.of<ResultScreenProvider>(context, listen: false);
@@ -459,7 +507,7 @@ class _ResultScreenState extends State<ResultScreen> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Cancel'),
+              child: buttonText('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
