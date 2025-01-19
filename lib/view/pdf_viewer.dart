@@ -208,8 +208,11 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
         backgroundColor: AppColors.themeColor,
         foregroundColor: Colors.white,
       ),
-      body: isLoading
-          ? const Center(
+      body: Column(
+        children: [
+          Expanded(
+            child: isLoading
+                ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -220,6 +223,9 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
                     height: 22,
                   ),
                   Text("Large file take time, please wait while loading"),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -229,22 +235,33 @@ class PDFViewerScreenState extends State<PDFViewerScreen> {
                             color: AppColors.themeColor,
                             fontWeight: FontWeight.bold),
                       ),
-                      Text("First download, then see"),
+                      Text("First download then use it"),
                     ],
                   )
                 ],
               ),
             )
-          : errorMessage != null
-              ? _buildErrorUI()
-              : localPath != null
-                  ? _renderFile()
-                  : const Center(
-                      child: Text(
-                        "Unable to display file.",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                : errorMessage != null
+                ? _buildErrorUI()
+                : localPath != null
+                ? _renderFile()
+                : const Center(
+              child: Text(
+                "Unable to display file.",
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+          if (widget.fileType == "pdf" && !isLoading && localPath != null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Page ${currentPage + 1} of $totalPages",
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+        ],
+      ),
     );
   }
 

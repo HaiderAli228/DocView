@@ -55,7 +55,7 @@ class ResultScreenState extends State<ResultScreen> {
       create: (_) => ResultScreenProvider()
         ..initialize(widget.folderId, widget.folderName),
       child: Scaffold(
-        backgroundColor: Colors.white.withOpacity(0.98),
+        backgroundColor: Colors.white.withOpacity(0.97),
         appBar: AppBar(
           backgroundColor: AppColors.themeColor,
           foregroundColor: Colors.white,
@@ -281,11 +281,14 @@ class ResultScreenState extends State<ResultScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              'assets/images/file.png',
-              width: 55,
-              height: 55,
-              fit: BoxFit.contain,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Image.asset(
+                'assets/images/file.png',
+                width: 55,
+                height: 55,
+                fit: BoxFit.contain,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -293,14 +296,17 @@ class ResultScreenState extends State<ResultScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    file['name'] ?? 'Unknown File',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Text(
+                      file['name'] ?? 'Unknown File',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
                   ),
                   const SizedBox(height: 8),
                   _buildFileActions(fileUrl, file['name'] ?? '', context),
@@ -500,7 +506,7 @@ class ResultScreenState extends State<ResultScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          iconColor: AppColors.themeColor,
+          surfaceTintColor: Colors.white,
           shadowColor: Colors.grey,
           title: const Text('Download Complete'),
           content:

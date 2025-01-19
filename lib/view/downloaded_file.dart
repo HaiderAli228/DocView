@@ -36,7 +36,7 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Slight opacity for background
+      backgroundColor: Colors.white.withOpacity(0.98), // Slight opacity for background
       appBar: AppBar(
         backgroundColor: AppColors.themeColor, // Custom app theme color
         foregroundColor: Colors.white,
@@ -178,7 +178,6 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Delete File'),
         backgroundColor: Colors.white,
-        elevation: 8,
         surfaceTintColor: Colors.white,
         shadowColor: Colors.grey,
         content: const Text('Are you sure you want to delete this file?'),
@@ -192,6 +191,11 @@ class _DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
               Navigator.of(ctx).pop();
               _deleteFile(fileMetadata); // Perform deletion
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+              AppColors.themeColor, // Set background color to purple
+              foregroundColor: Colors.white, // Set text color to white
+            ),
             child: const Text('Delete'),
           ),
         ],
