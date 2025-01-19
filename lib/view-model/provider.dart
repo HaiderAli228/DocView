@@ -180,20 +180,20 @@ class ResultScreenProvider extends ChangeNotifier {
   }
 
   int _activeDownloads = 0;
-  bool isDownloading = true;
+
   int get activeDownloads => _activeDownloads;
 
+  // Increment active downloads
   void incrementDownload() {
     _activeDownloads++;
-    isDownloading = false;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update UI
   }
 
+  // Decrement active downloads
   void decrementDownload() {
     if (_activeDownloads > 0) {
       _activeDownloads--;
-      isDownloading = true;
-      notifyListeners();
+      notifyListeners(); // Notify listeners to update UI
     }
   }
 }

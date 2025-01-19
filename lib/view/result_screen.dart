@@ -93,20 +93,23 @@ class ResultScreenState extends State<ResultScreen> {
                       bottom: 15,
                       end: -10,
                     ),
+                    // Show badge only when activeDownloads > 0
                     badgeContent: provider.activeDownloads > 0
                         ? Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
                               '${provider.activeDownloads}',
                               style: const TextStyle(
-                                  color: AppColors.themeColor, fontSize: 12),
+                                color: AppColors.themeColor,
+                                fontSize: 12,
+                              ),
                             ),
                           )
                         : null,
                     badgeStyle: BadgeStyle(
-                      badgeColor: provider.isDownloading
-                          ? Colors.transparent
-                          : Colors.white,
+                      badgeColor: provider.activeDownloads > 0
+                          ? Colors.white // Visible when downloads are active
+                          : Colors.transparent, // Transparent when no downloads
                       shape: BadgeShape.circle,
                     ),
                     child: Container(
@@ -450,7 +453,7 @@ class ResultScreenState extends State<ResultScreen> {
 
       final provider =
           Provider.of<ResultScreenProvider>(context, listen: false);
-      provider.incrementDownload();
+      provider.incrementDownload(); // Increment active downloads
       Fluttertoast.showToast(
           backgroundColor: AppColors.themeColor,
           gravity: ToastGravity.BOTTOM,
@@ -485,7 +488,7 @@ class ResultScreenState extends State<ResultScreen> {
     } finally {
       final provider =
           Provider.of<ResultScreenProvider>(context, listen: false);
-      provider.decrementDownload();
+      provider.decrementDownload(); // Decrement active downloads
     }
   }
 
